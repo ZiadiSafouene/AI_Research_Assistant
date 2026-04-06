@@ -1,0 +1,2899 @@
+Explainable Artificial Intelligence:
+A Survey of Needs, Techniques, Applications, and Future Direction
+Melkamu Mershaa, Khang Lamb, Joseph Wooda, Ali AlShamia, Jugal Kalitaa
+aCollege of Engineering and Applied Science, University of Colorado Colorado Springs, , 80918, CO, USA
+bCollege of Information and Communication Technology, Can Tho University, , Can Tho, 90000, Vietnam
+Abstract
+Artificial intelligence models encounter significant challenges due to their black-box nature, particularly in safety-critical domains
+such as healthcare, finance, and autonomous vehicles. Explainable Artificial Intelligence (XAI) addresses these challenges by
+providing explanations for how these models make decisions and predictions, ensuring transparency, accountability, and fairness.
+Existing studies have examined the fundamental concepts of XAI, its general principles, and the scope of XAI techniques. However,
+there remains a gap in the literature as there are no comprehensive reviews that delve into the detailed mathematical representa-
+tions, design methodologies of XAI models, and other associated aspects. This paper provides a comprehensive literature review
+encompassing common terminologies and definitions, the need for XAI, beneficiaries of XAI, a taxonomy of XAI methods, and
+the application of XAI methods in different application areas. The survey is aimed at XAI researchers, XAI practitioners, AI model
+developers, and XAI beneficiaries who are interested in enhancing the trustworthiness, transparency, accountability, and fairness of
+their AI models.
+Keywords: XAI, explainable artificial intelligence, interpretable deep learning, machine learning, neural networks, evaluation
+methods, computer vision, natural language processing, NLP, transformers, time series, healthcare, and autonomous cars.
+1. Introduction
+Since the advent of digital computer systems, scientists have
+been exploring ways to automate human intelligence via com-
+putational representation and mathematical theory, eventually
+giving birth to a computational approach known as Artificial
+Intelligence (AI). AI and machine learning (ML) models are
+being widely adopted in various domains, such as web search
+engines, speech recognition, self-driving cars, strategy game-
+play, image analysis, medical procedures, and national de-
+fense, many of which require high levels of security, transpar-
+ent decision-making, and a responsibility to protect information
+[1, 2]. Nevertheless, significant challenges remain in trusting
+the output of these complex ML algorithms and AI models be-
+cause the detailed inner logic and system architectures are ob-
+fuscated by the user by design.
+AI has shown itself to be an efficient and effective way to
+handle many tasks at which humans usually excel. In fact, it
+has become pervasive, yet hidden from the casual observer, in
+our day-to-day lives. As AI techniques proliferate, the imple-
+mentations are starting to outperform even the best expectations
+across many domains [3]. Since AI solves difficult problems,
+the methodologies used have become increasingly complex. A
+common analogy is that of the black box, where the inputs are
+well-defined, as are the outputs. However, the process is not
+transparent and cannot be easily understood by humans. The
+AI system does not usually provide any information about how
+it arrives at the decisions it makes. The systems and processes
+used in decision-making are often abstruse and contain uncer-
+tainty in how they operate. Since these systems impact lives,
+it leads to an emerging need to understand how decisions are
+made. Lack of such understanding makes it difficult to adopt
+such a powerful tool in industries that require sensitivity or that
+are critical to the survival of the species.
+The black-box nature of AI models raises significant con-
+cerns, including the need for explainability, interpretability, ac-
+countability, and transparency. These aspects, along with legal,
+ethical, and safety considerations, are crucial for building trust
+in AI, not just among scientists but also among the wider pub-
+lic, regulators, and politicians who are increasingly attentive to
+new developments. With this in mind, there has been a shift
+from just relying on the power of AI to understanding and in-
+terpreting how AI has arrived at decisions, leading to terms such
+as transparency, explainability, interpretability, or, more gener-
+ally, eXplainable Artificial Intelligence (XAI). A new approach
+is required to trust the AI and ML models, and though much
+has been accomplished in the last decades, the interpretability
+and black-box issues are still prevalent [4, 5]. Attention given
+to XAI has grown steadily (Figure 1), and XAI has attracted a
+thriving number of researchers, though there still exists a lack
+of consensus regarding symbology and terminology. Contri-
+butions rely heavily on their own terminology or theoretical
+framework [6].
+Researchers have been working to increase the interpretabil-
+ity of AI and ML models to gain better insight into black-box
+decision-making. Questions being explored include how to ex-
+plain the decision-making process, approaches for interpretabil-
+ity and explainability, ethical implications, and detecting and
+1
+arXiv:2409.00265v2  [cs.AI]  13 Jan 2025
+Figure 1: Research publications in the explainability of artificial intelligence
+(XAI) field during the last few years
+addressing potential biases or errors [1, 7]. These and other crit-
+ical questions remain open and require further research. This
+survey attempts to address these questions and provide new in-
+sights to advance the adoption of explainable artificial intelli-
+gence among different stakeholders, including practitioners, ed-
+ucators, system designers, developers, and other beneficiaries.
+A significant number of comprehensive studies on XAI have
+been released. XAI survey publications usually focus on de-
+scribing XAI basic terminology, outlining the explainability
+taxonomy, presenting XAI techniques, investigating XAI ap-
+plications, analyzing XAI opportunities and challenges, and
+proposing future research directions. Depending on the goals
+of each study, the researchers may concentrate on specific as-
+pects of XAI. Some outstanding survey papers and their main
+contributions are as follows. Gilpin et al. [8] defined and distin-
+guished the key concepts of XAI, while Adadi and Berrada [9]
+introduced criteria for developing XAI methods.
+Arrieta et
+al. [10] and Minh et al. [11] concentrated on XAI techniques.
+In addition to XAI techniques, Vilone and Longo [4] also ex-
+plored the evaluation methods for XAI. Stakeholders, who ben-
+efit from XAI, and their requirements were examined by Langer
+et al. [12]. Speith [13] performed studies on the common XAI
+taxonomies and identified new approaches to build new XAI
+taxonomies.
+R auker et al. [14] emphasized on inner inter-
+pretability of the deep learning models. The use of XAI to
+enhance machine learning models is investigated in the study
+of Weber et al. [15]. People have discussed the applications of
+XAI in a variety of domains and tasks [16] or specific domains,
+such as medicine [17, 18, 19], healthcare [20, 21, 22, 23], and
+finance [23]. Recently, Longo et al. [24] proposed a manifesto
+to govern the XAI studies and introduce more than twenty open
+problems in XAI and their suggested solutions.
+Our systematic review carefully analyzes more than two hun-
+dred studies in the domain of XAI. This survey provides a com-
+plete picture of XAI techniques for beginners and advanced re-
+searchers. It also covered explainable models, application ar-
+eas, evaluation of XAI techniques, challenges, and future direc-
+tions in the domain, Figure 2. The survey provides a compre-
+hensive overview of XAI concepts, ranging from foundational
+principles to recent studies incorporating mathematical frame-
+works. In Figure 2, our  all you need here  shows how our
+survey offers a clear and systematic approach, enabling read-
+ers to understand the multifaceted nature of XAI. To the best
+of our knowledge, this is the first work to comprehensively re-
+view explainability across traditional neural network models,
+reinforcement learning models, and Transformer-based mod-
+els (including large language models and Vision Transformer
+models), covering various application areas, evaluation meth-
+ods, XAI challenges, and future research directions.
+Figure 2:  All you need here -A comprehensive overview of XAI concepts.
+The main contributions of our work are presented below:
+  Develop and present a comprehensive review of XAI that
+addresses and rectifies the limitations observed in previous
+review studies.
+  More than two hundred research articles were surveyed in
+this comprehensive study in the XAI field.
+  Discuss the advantages and drawbacks of each XAI tech-
+nique in depth.
+  Highlight the research gaps and challenges of XAI to
+strengthen future works.
+The paper is organized into eight sections: Section 2 intro-
+duces relevant terminology and reviews the background and
+motivation of XAI research. Section 3 and Section 4 present
+types of explainability techniques and discussions on XAI tech-
+niques along different dimensions, respectively. Section 5 dis-
+cusses XAI techniques in different applications. Section 6 and 7
+present XAI evaluation methods and future research direction,
+respectively. Section 8 concludes the survey.
+2. Background and Motivation
+Black-box AI systems have become ubiquitous and are per-
+vasively integrated into diverse areas. XAI has emerged as a
+2
+necessity to establish trustworthy and transparent models, en-
+sure governance and compliance, and evaluate and improve the
+decision-making process of AI systems.
+2.1. Basic Terminology
+Before discussing XAI in-depth, we briefly present the basic
+terminology used in this work.
+AI systems can perform tasks that normally require human
+intelligence [25]. They can solve complex problems, learn from
+large amounts of data, make autonomous decisions, and under-
+stand and respond to challenging prompts using complex algo-
+rithms.
+XAI systems refer to AI systems that are able to provide
+explanations for their decisions or predictions and give insight
+into their behaviors.
+In short, XAI attempts to understand
+ WHY did the AI system do X? . This can help build compre-
+hensions about the influences on a model and specifics about
+where a model succeeds or fails [11].
+Trust is the degree to which people are willing to have con-
+fidence in the outputs and decisions provided by an AI system.
+A relevant question is: Does the user trust the output enough to
+perform real-world actions based upon it? [26].
+Machine learning is a rapidly evolving field within com-
+puter science. It is a subset of AI that involves the creation of
+algorithms designed to emulate human intelligence by captur-
+ing data from surrounding environments and learning from such
+data using models, as discussed in the previous paragraph [27].
+ML imitates the way humans learn, gradually improving accu-
+racy over time based on experience. In essence, ML is about en-
+abling computers to think and act with less human intervention
+by utilizing vast amounts of data to recognize patterns, make
+predictions, and take actions based on that data.
+Models and algorithms are two different concepts. How-
+ever, they are used together in the development of real-world
+AI systems. A model (in the context of machine learning) is a
+computational representation of a system whose primary pur-
+pose is to make empirical decisions and predictions based on
+the given input data (e.g., neural network, decision tree, or lo-
+gistic regression). In contrast, an algorithm is a set of rules or
+instructions used to perform a task. The models can be simple
+or complex, and trained on the input data to improve their accu-
+racy in decision-making or prediction. Algorithms can also be
+simple or complex, but they are used to perform a specific task
+without any training. Models and algorithms differ by output,
+function, design, and complexity [28].
+Deep learning refers to ML approaches for building multi-
+layer (or  deep ) artificial neural network models that solve
+challenging problems. Specifically, multiple (and usually com-
+plex) layers of neural networks are used to extract features from
+data, where the layers between the input and output layers are
+ hidden  and opaque [29].
+A black-box model refers to the lack of transparency and
+understanding of how an AI model works when making pre-
+dictions or decisions. Extensive increases in the amount of data
+and performance of computational devices have driven AI mod-
+els to become more complex, to the point that neural networks
+have arguably become as opaque as the human brain [30]. The
+model accepts the input and gives the output or the prediction
+without any reasonable details about why and how the model
+made that prediction or decision. The black-box nature of AI
+models can be attributed to various factors, including model
+complexity, optimization algorithms, large and complex train-
+ing data sets, and the algorithms and processes used to train the
+models. Deep neural AI models, in particular, exacerbate these
+concerns due to the design of deep neural networks (DNN),
+with components that remain hidden from human comprehen-
+sion.
+2.2. Need for Explanation
+Black-box AI systems have become ubiquitous throughout
+society, extensively integrated in a diverse range of disciplines,
+and can be found permeating many aspects of daily activities.
+The need for explainability in real-world applications is multi-
+faceted and essential for ensuring the performance and reliabil-
+ity of AI models while allowing users to work effectively with
+these models. XAI is becoming essential in building trustwor-
+thy, accountable, and transparent AI models to satisfy delicate
+application designs [31, 32].
+Transparency: Transparency is the capability of an AI sys-
+tem to provide understandable and reasonable explanations of a
+model s decision or prediction process [4, 33, 34]. XAI systems
+explain how AI models arrive at their prediction or decision so
+that experts and model users can understand the logic behind
+the AI systems [17, 35], which is crucial for trustworthiness and
+transparency. Transparency has a meaningful impact on peo-
+ple s willingness to trust the AI system by using directly inter-
+pretable models or availing XAI system explanations [36]. For
+example, if on a mobile device, voice-to-text recognition sys-
+tems produce wrong transcription, the consequences may not
+always be a big concern although it may be irritating. This may
+also be the case in a chat program like ChatGPT if the questions
+and answers are  simple . In this case, the need for explainabil-
+ity and transparency is less profound. In contrast, explainabil-
+ity and transparency are crucial in critical safety systems such
+as autonomous vehicles, medical diagnosis and treatment sys-
+tems, air traffic control systems, and military systems [2].
+Governance and compliance issues: XAI enables gover-
+nance in AI systems by confirming that decisions made by AI
+systems are ethical, accountable, transparent, and compliant
+with any laws and regulations. Organizations in domains such
+as healthcare and finance can be subject to strict regulations,
+requiring human understanding for certain types of decisions
+made by AI models [1, 37, 38]. For example, if someone is
+denied a loan by the bank s AI system, he or she may have the
+right to know why the AI system made this decision. Simi-
+larly, if a class essay is graded by an AI and the student gets
+a bad grade, an explanation may be necessary. Bias is often
+present in the nature of ML algorithms  training process, which
+is sometimes difficult to notice. This raises concerns about an
+algorithm acting in a discriminatory way. XAI has been found
+to serve as a potential remedy for mitigating issues of discrim-
+ination in the realms of law and regulation [39]. For instance,
+3
+if AI systems use sensitive and protected attributes (e.g., re-
+ligion, gender, sexual orientation, and race) and make biased
+decisions, XAI may help identify the root cause of the bias and
+give insight to rectify the wrong decision. Hence, XAI can help
+promote compliance with laws and regulations regarding data
+privacy and protection, discrimination, safety, and reliability.
+Model performance and debugging: XAI offers poten-
+tial benefits in enhancing the performance of AI systems, par-
+ticularly in terms of model design and debugging as well as
+decision-making processes [2, 40, 41]. The use of XAI tech-
+niques facilitates the identification and selection of relevant fea-
+tures for developing accurate and practical models. These tech-
+niques help tune hyperparameters such as choice of activation
+functions, number of layers, and learning rates to prevent under-
+fitting or overfitting. The explanation also helps the developers
+with bias detection in the decision-making process. If the de-
+velopers quickly detect the bias, they can adjust the system to
+ensure that outputs are unbiased and fair. XAI can enable de-
+velopers to identify decision-making errors and correct them,
+helping develop more accurate and reliable models. Explana-
+tion can enable users to have more control over the models so
+as to be able to modify the input parameters and observe how
+parameter changes affect the prediction or decision. Users can
+also provide feedback to improve the model decision process
+based on the XAI explanation.
+Reliability: ML models  predictions and outputs may result
+in unexpected failures. We need some control mechanisms or
+accountability to trust the AI models  predictions and decisions.
+For example, a wrong decision by a medical or self-driving
+black-box may result in high risk for the impacted human be-
+ings [31, 38].
+Safety: In certain applications, such as self-driving cars or
+military drones, it is important to understand the decisions made
+by an AI system in order to ensure the safety, security, and the
+lives of humans involved [42].
+Human-AI collaboration: XAI can facilitate collaboration
+between humans and AI systems by enabling humans to under-
+stand the reasoning behind an AI s actions [43].
+2.3. Stakeholders of the XAI
+Broadly speaking, all users of XAI systems, whether direct
+or indirect, stand to benefit from AI technology. Some of the
+most common beneficiaries of the XAI system are identified in
+Figure 3.
+Society: XAI plays a significant role in fostering social col-
+laboration and human-machine interactions [2] by increasing
+the trustworthiness, reliability, and responsibility of AI systems,
+helping reduce the negative impacts such as unethical use of AI
+systems, discrimination, and biases. Hence, XAI promotes trust
+and the usage of models in society.
+Governments and associated organizations: Governments
+and governmental organizations have become AI system users.
+Therefore, the government will be greatly benefited by XAI
+systems. XAI can help develop the government s public pol-
+icy decisions, such as public safety and resource allocation, by
+making them transparent, accountable, and explainable to soci-
+ety.
+Figure 3: XAI stakeholders/beneficiaries.
+Industries: XAI is crucial for industries to provide trans-
+parent, interpretable, accountable, and trustable services and
+decision-making processes. XAI can also help industries iden-
+tify and reduce the risk of errors and biases, improve regulatory
+compliance, enhance customer trust and confidence, facilitate
+innovations, and increase accountability and transparency.
+Researchers and system developers: The importance of
+XAI to researchers and AI system developers cannot be over-
+stated, as it provides critical insights that lead to improved
+model performance. Specifically, XAI techniques enable them
+to understand how AI models make decisions, and enable the
+identification of potential improvement and optimization. XAI
+helps facilitate innovation and enhance the interpretability and
+explainability of the model. From a regulatory perspective, XAI
+can help enhance compliance with legal issues, in particular
+laws and regulations related to fairness, privacy, and security
+in the AI system. Finally, XAI can facilitate the debugging pro-
+cess critical to researchers and system developers, leading to
+the identification and correction of errors and biases.
+2.4. Interpretability vs. Explainability
+The concepts of interpretability and explainability are dif-
+ficult to define rigorously.
+There is ongoing debate and re-
+search about the best ways to operationalize and measure these
+two concepts. Even terminology can vary or be used in con-
+tradictory ways, though the concepts of building comprehen-
+sion about what influences a model, how influence occurs, and
+where the model performs well and fails, are consistent within
+the many definitions of these terms. Most studies at least agree
+that explainability and interpretability are related but distinct
+concepts. Previous work suggests that interpretability is not a
+monolithic concept but a combination of several distinct ideas
+4
+that must be disentangled before any progress can be made to-
+ward a rigorous definition [44]. Explainability is seen as a sub-
+set of interpretability, which is the overarching concept that en-
+compasses the idea of opening the black-box.
+The very first definition of interpretability in ML systems is
+ the ability to explain or to present in understandable terms to a
+human  [39], while explainability is  the collection of features
+of the interpretable domain, that have contributed for a given
+example to produce a decision  [45]. As indicated by Fuhrman
+et al. [46], interpretability refers to  to understanding algorithm
+output for end-user implementation  and explainability refers
+to  techniques applied by a developer to explain and improve
+the AI system . Gurmessa and Jimma [47] defined these con-
+cepts as  the extent to which human observers can understand
+the internal decision-making processes of the model  and  the
+provision of explanations for the actions or procedures under-
+taken by the model , respectively.
+According to Das et al., [48], interpretability and explainabil-
+ity are the ability  to understand the decision-making process of
+an AI model  and  to explain the decision-making process of an
+AI model in terms understandable to the end user , respectively.
+Another study defines these two concepts as  the ability to de-
+termine cause and effect from a machine learning model  and
+ the knowledge to understand representations and how impor-
+tant they are to the model s performance , respectively [8]. The
+AWS reports that interpretability is  to understand exactly why
+and how the model is generating predictions , whereas explain-
+ability is  is how to take an ML model and explain the behavior
+in human terms .
+The goal of explainability and interpretability is to make it
+clear to a user how the model arrives at its output, so that the
+user can understand and trust the model s decisions. However,
+there are no satisfactory functionally-grounded criteria or uni-
+versally accepted benchmarks [49]. The most common defi-
+nitions of interpretable ML models are those that are easy to
+understand and describe, while explainable ML models can
+provide an explanation for their predictions or decisions [50].
+A model that is highly interpretable is one that is simple and
+transparent, and whose behavior can be easily understood and
+explained by humans. Conversely, a model that is not inter-
+pretable is one that is complex and opaque, and whose behavior
+is difficult for humans to understand or explain [51].
+In general, interpretability is concerned with how a model
+works, while explainability is concerned with why a model
+makes a particular prediction or decision. Interpretability is
+crucial because it allows people to understand how a model is
+making predictions, which can help build trust in the model and
+its results. Explainability is important because it allows peo-
+ple to understand the reasoning behind a model s predictions,
+which can help identify any biases or errors in the model. Ta-
+ble 1 presents some representative XAI techniques and where
+they lie on the spectrum.
+3. Categories of Explainability Techniques
+In this section, we introduce a taxonomy for XAI techniques
+and use specific criteria for general categorization. These ex-
+plainability criteria, such as scope, stage, result, and function
+[48, 10, 13], are what we believe to be the most important be-
+cause they provide a systematic and comprehensive framework
+for understanding and evaluating different XAI techniques. We
+have developed this taxonomy through rigorous study and anal-
+ysis of existing taxonomies, along with an extensive review
+of research literature pertinent to explainable artificial intelli-
+gence.
+We categorize our reviewed papers by the scope of
+explainability and training level or stage. The explainability
+technique can be either global or local, and model-agnostic or
+model-specific, which can explain the model s output or func-
+tion [9].
+3.1. Local and Global Explanation Techniques
+Local and global approaches refer to the scope of explana-
+tions provided by an explainability technique. Local explana-
+tions are focused on explaining predictions or decisions made
+by a specific instance or input to a model [2, 10]. This approach
+is particularly useful for examining the behavior of the model
+in relation to the local, individual predictions or decisions.
+Global techniques provide either an overview or a complete
+description of the model, but such techniques usually require
+knowledge of input data, algorithm, and trained model [44].
+The global explanation technique needs to understand the
+whole structures, features, weights, and other parameters. In
+practice, global techniques are challenging to implement since
+complex models with multiple dimensions, millions of param-
+eters, and weights are challenging to understand.
+3.2. Ante-hoc and Post-hoc Explanation Techniques
+Ante-hoc and post-hoc explanation techniques are two dif-
+ferent ways to explain the inner workings of AI systems. The
+critical difference between them is the stage in which they
+are implemented [7]. The ante-hoc XAI techniques are em-
+ployed during the training and development stages of an AI sys-
+tem to make the model more transparent and understandable,
+whereas the post-hoc explanation techniques are employed af-
+ter the AI models have been trained and deployed to explain
+the model s prediction or decision-making process to the model
+users.
+Post-hoc explainability focuses on models which are
+not readily explainable by ante-hoc techniques. Ante-hoc and
+post-hoc explanation techniques can be employed in tandem to
+gain a more comprehensive comprehension of AI systems, as
+they are mutually reinforcing [10]. Some examples of ante-
+hoc XAI techniques are decision trees, general additive models,
+and Bayesian models. Some examples of post-hoc XAI tech-
+niques are Local Interpretable Model-Agnostic Explanations
+(LIME) [26] and Shapley Additive Explanations (SHAP) [52].
+Arrieta et al. [10] classify the post-hoc explanation tech-
+niques into two categories:
+  Model-specific approaches provide explanations for the
+predictions or decisions made by a specific AI model,
+based on the model s internal working structure and de-
+sign. These techniques may not apply to other models with
+varying architectures, since they are designed for specific
+models [4]. However, a model-specific technique provides
+5
+Table 1: Examples of representative XAI techniques and where they lie on the spectrum.
+Spectrum
+XAI techniques
+How does it work
+How to understand and explain
+Closer to
+Interpretability
+Linear regression
+Use a linear relationship between
+the input features and the target
+variables to make predictions.
+Because the model is based on simple linear
+equations, it is easy for a human to under-
+stand and explain the relationship between
+the input features and the target variable.
+This is built into the model.
+Rule-based mod-
+els
+Use a set of explicit rules to make
+predictions.
+Because the rules are explicit and transpar-
+ent, these models are both interpretable and
+explainable, as it is easy for a human to un-
+derstand and explain the rules that the model
+is using.
+In the middle
+Decision trees
+Use a series of simple decision
+rules to make predictions.
+These decision rules are based on the val-
+ues of the input features. Because it is easy
+to trace the model s predictions back to the
+input data and the decision rules, it s both
+interpretable and explainable.
+Closer to
+Explainability
+Feature
+impor-
+tance analysis
+Use
+an
+algorithm
+to
+identify
+the most important features in a
+model s prediction or decision.
+Because it provides a clear understanding of
+which features are most important, it is easy
+to trace the model s predictions back to the
+input features. This is usually post-hoc and
+not part of the model architecture, so more
+explainable then interpretable.
+Local
+inter-
+pretable
+model-
+agnostic explana-
+tions
+Use an approximate model to pro-
+vide explanations for the predic-
+tions of a complex ML model. It
+works by approximating the com-
+plex model with a simple, inter-
+pretable model, and providing ex-
+planations based on the simple
+model.
+Because it provides explanations for the pre-
+dictions of a complex model in a way that
+is understandable to a human and is model-
+agnostic, LIME is explainable
+good insights into how the model works and makes a de-
+cision. For example, neural networks, random forests, and
+support vector machine models require model-specific ex-
+planation methods. The model-specific technique in neu-
+ral networks provides more comprehensive insights into
+the network structure, including how weights are allocated
+to individual neurons and which neurons are explicitly ac-
+tivated for a given instance.
+  Model-agnostic approaches are applied to all AI models
+and provide explanations of the models without depending
+on an understanding of the model s internal working struc-
+ture or design. This approach is used to explain complex
+models that are difficult to explain using ante-hoc expla-
+nation techniques. Model-agnostic approaches are model
+flexible, explanation flexible, and representation flexible,
+making them useful for a wide range of models. However,
+if the model is very complex, it may be hard to understand
+its behavior globally due to its flexibility and interpretabil-
+ity [51].
+3.3. Perturbation-based and Gradient-based XAI
+Perturbation-based and gradient-based methods are two of
+the most common algorithmic design methodologies for devel-
+oping XAI techniques. Perturbation-based methods operate by
+modifying the input data, while gradient-based methods calcu-
+late the gradients of the model s prediction with respect to its
+input data. Both techniques compute the importance of each
+input feature through different approaches and can be used for
+local and global explanations. Additionally, both techniques are
+generally model-agnostic.
+Perturbation-based XAI methods use perturbations to deter-
+mine the importance of each feature in the model s prediction
+process. These methods involve modifying the input data, such
+as removing certain input examples, masking specific input fea-
+tures, producing noise over the input features, observing how
+the model s output changes as a result, generating perturbations,
+and analyzing the extent to which the output is affected by the
+change of the input data. By comparing the original output with
+the output from the modified input, it is possible to infer which
+features of the input data are most important for the model s
+prediction [26]. The importance of each feature value provides
+valuable insights into how the model made that prediction [52].
+6
+Hence, the explanation of the model is generated iteratively us-
+ing perturbation-based XAI techniques such as LIME, SHAP,
+and counterfactual.
+Gradient-based XAI methods obtain the gradients of the
+model s prediction with respect to its input features. These gra-
+dients reflect the sensitivity of the model s output to changes in
+each input feature [53]. A higher gradient value for an input
+feature implies greater importance for the model s prediction.
+Gradient-based XAI methods are valuable for their ability to
+handle high-dimensional input space and scalability for large
+datasets and models. These methods can help gain a deeper un-
+derstanding of the model and detect errors and biases that de-
+crease its reliability and accuracy, particularly in safety-critical
+applications such as health care and self-driving cars [2]. Class
+activation maps, integrated gradients, and saliency maps are
+among the most commonly used gradient-based XAI methods.
+Figure 4 presents a summary of explainability taxonomy dis-
+cussed in this section.
+Figure 5 illustrates a chronological overview of the state-of-
+the-art XAI techniques focused on in this survey. Perturbation-
+based methods like LIME, SHAP, Counterfactual explanations,
+and gradient approaches, including LRP, CAM, and Integrated
+Gradients, have been selected for detailed discussion in this
+context. They serve as foundational frameworks upon which
+other techniques are built, highlighting their significance in
+the field.  Transformer Interpretability Beyond Attention Vi-
+sualization  [54] and  XAI for Transformers: Better Explana-
+tions through Conservative Propagation  [55] are foundational
+works for discussing transformer explainability, providing key
+insights and practices that serve as a baseline in this survey.
+4. Detailed Discussions on XAI Techniques
+XAI techniques differ in their underlying mathematical prin-
+ciples and assumptions, as well as in their applicability and lim-
+itations. We classify the widely used XAI techniques based on
+perturbation, gradient, and the use of the Transformer [56] ar-
+chitecture. The Transformer has become a dominant architec-
+ture in deep learning, whether it is in natural language process-
+ing, computer vision, time series data, or anything else. As a
+result, we include a separate section on Transformer explain-
+ability.
+4.1. Perturbation-based Techniques
+Perturbation-based XAI methods are used to provide local
+and global explanations of the black-box models by making
+small and controlled changes to the input data to gain insights
+into how the model made that decision. This section discusses
+the most predominant perturbation-based XAI techniques, such
+as LIME, SHAP, and Counterfactual Explanations (CFE), in-
+cluding their mathematical formulation and underlying assump-
+tions.
+4.1.1. LIME
+A standard definition of a black-box model f, where the in-
+ternal workings are unknown, is f : X  Y, where X and
+Y represent the input and output spaces, respectively [48, 57].
+Specifically, x  X denotes an input instance, and y  Y denotes
+the corresponding output or prediction. Let X  be the set of
+perturbed and generated sample instances around the instance
+x and x   X , an instance from this set. Another function g
+maps instances of X  to a set of representations denoted as Y 
+which are designed to be easily understandable or explainable:
+g : X   Y , where y   Y  is an output from the set of possible
+outputs in Y . The use of interpretable instances in Y  allows
+for clearer insights into the model s prediction processes.
+LIME [26] provides an explanation for each input instance x,
+where f(x) = y   y is the prediction of the black-box model.
+The LIME model is g  G where g is explanation model that be-
+longs to a set of interpretable models G. Let s say every g < G
+is  good enough  to be interpretable. To prove this hypothesis,
+LIME uses three important arguments: a measure of complexity
+ (g) of the explanation, ensuring it remains simple enough for
+human understanding; a proximity measure ( x(z)) that quanti-
+fies the closeness between the original instance x and its pertur-
+bations; and a fidelity measure  ( f, g,  x) which assesses how
+well g approximates f s predictions, aiming for this value to be
+minimal to maximize the faithfulness of the explanation. The
+following formula achieves the explanation produced by LIME:
+ (x) = argmin  ( f, g,  x) +  (g).
+(1)
+Figure 6 illustrates the LIME model for explaining a predic-
+tion of a black-box model based on an instance. LIME can be
+considered a model-agnostic technique for generating explana-
+tions that can be used across different ML models. LIME is
+insightful in understanding the specific decisions of a model by
+providing local individual instance explanations, and in detect-
+ing and fixing biases by identifying the most influential feature
+for a particular decision made by a model [10].
+4.1.2. SHAP
+SHAP [52] is a model-agnostic method, applicable to any
+ML model, ranging from simple linear models to complex
+DNN. This XAI technique employs contribution values as
+means for explicating the extent to which features contribute
+to a model s output. The contribution value is then leveraged to
+explain the output of a given instance x. SHAP computes the
+average contribution of each feature through the subset of fea-
+tures by simulating the model s behavior for all combinations
+of feature values. The difference in output is computed when
+a feature is excluded or included in that output process. The
+subsequent contribution values give a measure of the feature
+relevance, which is significant to the model s output [52, 58].
+Assume f is the original or black-box model, g is the expla-
+nation model, M is the number of simplified input features, x is
+a single input, and x  is a simplified input such that x = hx(x ).
+Additive feature attribution methods, such as SHAP, have a lin-
+ear function model explanation with binary variables.
+g(x ) =  0 +
+M
+X
+i=1
+ iz 
+i,
+(2)
+7
+Figure 4: Explainability taxonomy.
+Figure 5: Chronological order of state-of-the-art XAI techniques.
+where  0 is the default explanation when no binary features,
+z 
+i  {0, 1}M and  i  R. The SHAP model explanation must
+satisfy three properties to provide high accuracy [52]: (i)  lo-
+cal accuracy  requires that the explanation model g(x ) matches
+the original model f(x), (ii)  missingness  which states, if the
+simplified inputs denote feature presence, then its attribute in-
+fluence would be 0. More simply, if a feature is absent, it should
+have no impact on the model output, and (iii)  consistency  re-
+quires that if the contribution of a simplified input increases or
+stays the same (regardless of the other inputs), then the input s
+attribution should not decrease.
+SHAP leverages contribution values to explain the impor-
+tance of each feature to a model s output.
+The explanation
+is based on the Shapley values, which represent the average
+contribution of each feature over all possible subsets of fea-
+tures. However, in complex models, SHAP approximates the
+features of influences that may result in less accurate explana-
+tions. SHAP s explanation is model output dependent. If the
+model is biased, SHAP s explanation reflects the bias of the
+model behavior.
+4.1.3. CFE
+CFE [59] is used to explain the predictions made by the
+ML model using generated hypothetical scenarios to under-
+stand how the model s output is affected by changes in input
+data. The standard classification models are trained to find the
+the optimal set of weights w:
+argmin ( f (xi), yi) +  (w),
+(3)
+where f is a model,   is the regularizer to prevent overfitting
+in the training process, yi is the label for data point xi, and w
+represents the model parameters to be optimized. The argument
+8
+Figure 6: Illustration of LIME detailing instance-level interpretations for pre-
+dictions by a black-box model.
+argmin is the value of the variable that minimizes the given
+function, then,
+argminx max ( f (x )  y )2 + d(xi, x ).
+(4)
+This equation performs two different distance computations,
+comprising a quadratic distance between the model s output for
+the counterfactual x  and the required output y , and a distance d
+between the input data xi to be explained and the counterfactual
+x . The value of   can be maximized by solving for x  itera-
+tively and increasing the value of   until the closest solution
+is located. The distance function (viz., Manhattan distance) d
+should be carefully chosen based on task-specific requirements.
+The CFE technique offers valuable insights into the decision-
+making process of a model, thereby aiding in the identification
+of biases and errors present in the black-box model. Impor-
+tantly, the interpretation of the results and the insights gained
+from the counterfactual explanations can be model-agnostic,
+while the generation of the counterfactuals may not be. In addi-
+tion to being computationally expensive to generate counterfac-
+tuals, CFE is limited to individual instances and might not pro-
+vide a general behavior of the model. CFE is data distribution-
+dependent, which may not be consistent if the training data is
+incomplete or biased. Finally, CFE is sensitive to ethical con-
+cerns if counterfactuals make suggestions (e.g., gender or race).
+4.2. Gradient-based Techniques
+Gradient-based techniques use the gradients of the output
+with respect to the input features.
+They can handle high-
+dimensional input space, are scalable for large datasets, pro-
+vide deep insights into a model, and help detect errors and bi-
+ases. Saliency Maps, Layer-wise Relevance BackPropagation
+(LRP), Class Activation Maps (CAM), and Integrated Gradi-
+ents are the most common gradient-based XAI techniques and
+they are good frameworks for building other techniques.
+4.2.1. Saliency Map
+Simonyan et al. [60] utilized a saliency map for a model
+explanation for the first time in deep CNN. As a visualiza-
+tion technique, a saliency map, which is a model-agnostic tech-
+nique, highlights important features in the image classification
+model by computing the output s gradients for the input image
+and visualizing the most significant regions of that image for
+the model s prediction.
+Suppose an image I0, a specific class c, and the CNN classi-
+fication model with the class score function S c(I) (that is used
+to determine the score of the image) are analyzed. The pixels
+of I0 are ranked based on their impact on this score S c(I0). The
+linear score model for the class c is obtained as follows:
+S c(I) =  T
+c + bc,
+(5)
+where I is a one-dimensional vectorized image,  c is the weight
+vector, and bc is the model s bias. The magnitude of weights  
+specifies the relevance of the corresponding pixels of an image
+I for class c. In the case of non-linear functions, S c(I) requires
+to be approximated based on the neighborhood of I0 with the
+linear function using first-order Taylor expansion:
+S c(I)  T + b,
+(6)
+where   is the derivative of S c with respect to the input image
+I at the particular point in the image I0:
+  =  S c
+ I
+I0
+.
+(7)
+The saliency map is sensitive to noise in the input data, which
+may lead to incorrect explanations. The saliency map is only
+applicable to gradient-based models. It provides a local expla-
+nation for individual predictions without suggesting the global
+behavior of a model. The explanation of saliency maps is some-
+times ambiguous, where multiple features are highlighted, par-
+ticularly in complex images [10].
+4.2.2. LRP
+The main goal of LRP [61] is to explain each input feature s
+contribution to the model s output by assigning a relevance
+score to each neuron. LRP, as visualized in Figure 7, propa-
+gates the relevance score backward through the network layers.
+It assigns a relevance score to each neuron, which allows for
+the determination of the contribution of each input feature to
+the output of the model.
+Figure 7: Visualizing the LRP technique (adapted from [62]). Each neuron
+redistributes the relevance score to the lower layer (Rj) when it receives from,
+the higher layer (Rk).
+9
+LRP is subject to the conservation property, which means a
+neuron that receives the relevance score must be redistributed
+to the lower layer in an equal amount. Assume j and k are two
+consecutive layers, where layer k is closer to the output layer.
+The neurons in layer k have computed their relevance scores,
+denoted as (Rk)k, propagating relevance scores to layer j. Then,
+propagated relevance score to neuron Rj is computed using the
+following formula [62]:
+Rj =
+X
+k
+z jk
+P
+j zjk
+Rk,
+(8)
+where zjk is the contribution of neuron j to Rk and P
+j z jk is used
+to enforce the conservation property. In this context, a pertinent
+question arises as to how do we determine z jk, which represents
+the contribution of a neuron j to a neuron k in the network, is
+ascertained? LRP uses three significant rules to address this
+question [61].
+  The basic rule redistributes the relevance score to the input
+features in proportion to their positive contribution to the
+output.
+  The Epsilon rule uses an   to diminish relevance scores
+when contributions to neuron k are weak and contradic-
+tory.
+  The Gamma rule uses a large value of   to reduces negative
+contribution or to lower noise and enhance stability.
+Overall, LRP is faithful, meaning that it does not introduce
+any bias into the explanation [61]. This is important for en-
+suring that the explanations are accurate and trustworthy. LRP
+is complex to implement and interpret, which requires a good
+understanding of the neural networks  architecture. It is compu-
+tationally expensive for large and complex models to compute
+the backpropagating relevance scores throughout all layers of
+the networks. LRP is only applicable to backpropagation-based
+models like neural networks. It requires access to the internal
+structure and parameters of the model, which is sometimes im-
+possible if a model is proprietary. LRP is a framework for other
+XAI techniques. However, there is a lack of standardization,
+which leads to inconsistent explanations through different im-
+plementations.
+4.2.3. CAM
+CAM [63] is an explanation technique typically used for
+CNN and deep learning models applied to image data. For ex-
+ample, CAM can explain the predictions of a CNN model by
+indicating which regions of the input image the model is focus-
+ing on, or it can simply provide a heatmap for the output of the
+convolutional layer, as shown in Figure 8.
+Let fk(x, y) denote the activation of unit k in the last convo-
+lutional layer at location (x, y) in the given image, the global
+average pooling is computed by P
+x,y fk(x, y). Then, the input to
+the softmax function, called S c, for a given class c is obtained
+using the following formula:
+S c =
+X
+k
+wc
+k
+X
+x,y
+fk(x, y) =
+X
+x,y
+X
+k
+wc
+k fk(x, y),
+(9)
+Figure 8: The predicted class score is mapped back to the previous convolu-
+tional layer to generate the class activation maps (input image from CIFAR 10
+dataset).
+where wc
+k is the weight relating to the class c for unit k. We can
+compute the class activation map Mc for class c of each special
+element as P
+k wc
+k fk(x, y). Therefore, S c for a given class c can
+be rewritten:
+S c =
+X
+x,y
+Mc(x, y).
+(10)
+In the previous formula, Mc(x, y) shows the significance of the
+activation at spatial location (x, y), and it is critical to determine
+the class of the image to class c.
+CAM is a valuable explanation technique for understanding
+the decision-making process of deep learning models applied
+to image data.
+However, it is important to note that CAM
+is model-specific, as it requires access to the architecture and
+weights of the CNN model being used.
+4.2.4. Integrated Gradients
+Integrated Gradients [64] provides insights into the input-
+output behavior of DNNs which is critical in improving and
+building transparent ML models.
+Sundararajan et al.
+[64]
+strongly advocated that all attribution methods must adhere to
+two axioms. The Sensitivity axiom is defined such that  an
+attribution method satisfies Sensitivity if for every input and
+baseline that differ in one feature but have different predictions,
+then the differing feature should be given a non-zero attribu-
+tion . The violation of the Sensitivity axiom may expose the
+model to gradients being computed using non-relevant features.
+Thus, it is critical to control this sensitivity violation to assure
+the attribution method is in compliance. The Implementation
+Invariance axiom is defined as  two networks are functionally
+equivalent if their outputs are equal for all inputs, despite hav-
+ing very different implementations. Attribution methods should
+satisfy Implementation Invariance, i.e., the attributions are al-
+ways identical for two functionally equivalent networks . Sup-
+pose two neural networks perform the same task and gener-
+ate identical predictions for all inputs. Then, any attribution
+method used on them should provide the same attribution val-
+ues for each input to both networks, regardless of the differ-
+ences in their implementation details. This ensures that the at-
+tributions are not affected by small changes in implementation
+details or architecture, thus controlling inconsistent or unreli-
+able outputs. In this way, Implementation Invariance is critical
+10
+to ensuring consistency and trustworthiness of attribution meth-
+ods.
+Consider a function F: Rn  [0, 1], which represents a DNN.
+We take x  Rn to be the input instance and x   Rn be the base-
+line input. In order to produce a counterfactual explanation, it
+is important to define the baseline as the absence of a feature in
+the given input. However, it may be challenging to identify the
+baseline in a very complex model. For instance, the baseline for
+image data could be black images, while for NLP data, it could
+be a zero embedding vector, which is a vector of all zeroes used
+as a default value for words not found in the vocabulary. To
+obtain Integrated Gradients, we consider the straight-line path
+(in Rn) from x  (the baseline) to the input instance x and com-
+pute the gradients at all points along this path. The collection
+of these gradients provides the Integrated Gradients. In other
+words, Integrated Gradients can be defined as the path integral
+of the gradients along the straight-line path from x  to the input
+instance x.
+The gradient of F(x) along the ith dimension is given by  F(x)
+ xi ,
+leading to the Integrated Gradient (IG) along the ith dimension
+for an input x and baseline x  to be described as:
+IGi(x) = (xi  x 
+i)  
+Z 1
+ =0
+ F(x  +     (x  x ))
+ xi
+d .
+(11)
+The Integral Gradient XAI method satisfies several important
+properties, such as sensitivity, completeness, and implementa-
+tion details. It can be applied to any differential model, making
+it a powerful and model-specific tool for explanation in a DNN
+[64].
+4.3. XAI for Transformers
+Transformers [56] have emerged as the dominant architec-
+ture in Natural Language Processing (NLP), computer vision,
+multi-modal reasoning tasks, and a diverse and wide array of
+applications such as visual question answering, image-text re-
+trieval, cross-modal generation, and visual commonsense rea-
+soning [65]. Predictions and decisions in Transformer-based
+architectures heavily rely on various intricate attention mech-
+anisms, including self-attention, multi-head attention, and co-
+attention. Explaining these mechanisms presents a significant
+challenge due to their complexity. In this section, we explore
+the interpretability aspects of widely adopted Transformer-
+based architectures.
+Gradient Input [58], [66] and LRP [61] XAI techniques
+have been extended to explain Transformers [67], [68]. Atten-
+tion rollouts [69] and generic attention are new techniques to
+aggregate attention information [65] to explain the Transform-
+ers. LRP [61], Gradient Input [53], Integrated Gradients [64],
+and SHAP [52] are designed based on the conservation ax-
+iom for the attribution of each feature. The conservation ax-
+iom states that each input feature contributes a portion of the
+predicted score at the output. LRP is employed to assign the
+model s output back to the input features by propagating rele-
+vance scores backward through the layers of a neural network,
+measuring their corresponding contributions to the final output.
+The relevance scores signify how much each feature at each
+layer contributes to the final prediction and decision.
+The LRP framework is a baseline for developing various rel-
+evance propagation rules. Let s start the discussion by embed-
+ding Gradient Input into the LRP framework to explain Trans-
+formers [55]. Assume (xi)i and (y j)j represent the input and
+output vectors of the neurons, respectively, and f is the out-
+put of the model. Gradient Input attributions on these vector
+representations can be computed as:
+R(xi) = xi   ( f/ xi) and R(yj) = y j   ( f/ yj).
+(12)
+The gradients at different layers are computed using the chain
+rule. This principle states that the gradient of the function f
+with respect to an input neuron xi can be expressed as the sum
+of the products of two terms: the gradients of all connected
+neurons yj with respect to xi and the gradients of the function f
+with respect to those neurons yj. This is mathematically repre-
+sented as follows:
+ f
+ xi
+=
+X
+j
+ f
+ y j
+ yj
+ xi
+.
+(13)
+We can convert the gradient propagation rule into an equivalent
+relevance propagation by inserting equation (12) into equation
+(13):
+R(xi) =
+X
+j
+ yj
+ xi
+xi
+yj
+R(yj),
+(14)
+with
+the
+convention
+0/0=0.
+We
+can
+prove
+that
+P
+i R(xi) = P
+j R(yj) easily, and if this condition holds true,
+conservation also holds true. However, Transformers break this
+conservation rule. The following subsections discuss methods
+to improve propagation rule [55].
+4.3.1. Propagation in Attention Heads
+Transformers work based on Query (Q), Key (K), and
+Value (V) matrices, and consider the attention head, which uses
+these core components [56]. The attention heads have the fol-
+lowing structure:
+Y = softmax( 1
+ dk
+(X WQ)(XWK) )X,
+(15)
+where X = (xi)i and X  = (x 
+j) j are input sequences, Y = (yj) j
+is the sequence of the output, W{Q,K,V} are learned projection
+matrices, and dk is the dimensionality of the Key-vector. The
+previous equation is rewritten as follows:
+yj =
+X
+i
+xipi j,
+(16)
+where y j is the output, pi j =
+exp(qij)
+P
+i  exp(qi  j) is the softmax computa-
+tion, and qi j =
+1
+ dk x 
+i WKW 
+Qx 
+j is the matching function between
+the two input sequences.
+11
+4.3.2. Propagation in LayerNorm
+LayerNorm or Layer normalization is the crucial component
+in Transformers used to stabilize and improve the training of
+models. LayerNorm is involved in the centering and standard-
+ization of key operations, defined as follows:
+yi =
+xi  E[x]
+  + Var[x]
+,
+(17)
+where E[ ] and Var[ ] represent the mean and variance overall
+activation of the corresponding channel. The relevance prop-
+agation associated with Gradient Input is represented by the
+conservation equation:
+X
+i
+R(xi) = (1  
+Var[x]
+  + Var[x])
+X
+i
+R(yi),
+(18)
+where R(yj) = x 
+j( f/ yj). The implied propagation rules in
+attention heads and LayerNorm in equation (14) are replaced
+by ad-hoc propagation rules to ensure conservation. Hence, we
+make a locally linear expansion of attention head by observing
+the gating terms pij as constant, and these terms are considered
+as the weights of a linear layer which is locally mapping the
+input sequence x into the output sequence y. As a result, we
+can use the canonical LRP rule for linear layers as follows:
+R(xi) =
+X
+j
+xipij
+P
+i  xi  pi  j
+R(yj).
+(19)
+Recent studies such as Attention rollouts [69], generic atten-
+tion [65], and Better Explanations through Conservative Propa-
+gation [55] have provided empirical evidence that it is possible
+to improve the explainability of Transformers.
+4.4. Explainability in Reinforcement Learning
+Reinforcement Learning (RL) involves applications across
+various domains,
+including safety-critical areas like au-
+tonomous vehicles, healthcare, and energy systems [70, 71].
+In the domain of autonomous vehicles, RL is employed to re-
+fine adaptive cruise control and lane-keeping features by learn-
+ing optimal decision-making strategies from simulations of di-
+verse traffic scenarios [72].
+Explainability in reinforcement
+learning concerns the ability to understand and explain the ra-
+tionale behind the decisions made and actions taken by re-
+inforcement learning models within their specified environ-
+ments [73, 74, 75]. Post-hoc explanations, such as SHAP and
+LIME, can help us understand and explain which features are
+most important for the decision-making process of an RL agent
+[76, 77]. Example-based explanation methods, like trajectory
+analysis, help us to get insights into the decision-making pro-
+cess of the RL model by examining specific trajectories, such
+as sequences of states, actions, and rewards [78]. Visualiza-
+tion techniques enable us to understand and interpret the RL
+models by visually representing the model s decision-making
+processing [79]. Several explainability methods exist to inter-
+pret reinforcement learning models, including saliency maps,
+counterfactual explanations, policy distillation, attention mech-
+anisms, Human-in-the-loop, query system, and natural lan-
+guage explanations [80]. Explainability in reinforcement learn-
+ing is crucial, particularly for safety-critical domains, due to
+the need for trust, safety assurance, regulatory compliance, eth-
+ical decision-making, model debugging, collaborative human-
+AI interaction, accountability, and AI model adoption and ac-
+ceptance [73, 81, 82].
+4.5. Summary
+Applying XAI techniques can enhance transparency and
+trust in AI models by explaining their decision-making and
+prediction processes.
+These techniques can be classified
+into categories such as local or global, post-hoc or ante-hoc,
+model-specific or model-agnostic, and perturbation or gradient
+methodology. We have added a special subsection for reinforce-
+ment learning and Transformers due to their popularity and pro-
+found impact on applications of deep learning in a wide variety
+of areas. Table 2 summarizes the reviewed XAI techniques dis-
+cussed.
+5. XAI Techniques in Application Areas
+The area of XAI has been gaining attention in recent years
+due to the growing need for transparency and trust in ML mod-
+els [26, 52]. XAI techniques are being used to explain the pre-
+dictions of ML models [39, 2, 8]. These techniques can help
+identify errors and biases that decrease the reliability and ac-
+curacy of the models. This section explores the different XAI
+techniques used in natural language processing, computer vi-
+sion, and time series analysis, and how they contribute to im-
+proving the trust, transparency, and accuracy of ML models in
+different application areas.
+5.1. Explainability in Natural Language Processing
+Natural language processing employs ML, as it can help
+efficiently handle, process, and analyze vast amounts of text
+data generated daily through areas such as human-to-human
+communication, chatbots, emails, and context generation soft-
+ware, to name a few [83]. One barrier to implementation is
+that such data are usually not inherently clean, and prepro-
+cessing and training are essential tasks for achieving accurate
+results with language models [84].
+In NLP, language mod-
+els can be classified into three categories: transparent archi-
+tectures, neural network (non-Transformer) architectures, and
+transformer architectures.
+Transparent models are straight-
+forward and easy to understand due to their clear processing
+paths and direct interpretability. Models based on neural net-
+work (non-Transformer) architectures are often termed  black
+boxes  due to their multi-layered structures and non-linear pro-
+cessing. Transformer architectures utilize self-attention mech-
+anisms to process sequences of data. The increased complexity
+and larger number of parameters often make transformer-based
+models less interpretable, requiring advanced techniques to ex-
+plain their decision-making processes.
+12
+Table 2: The XAI techniques discussed, the methods used, their advantages and disadvantages.
+Technique
+Scope
+Application Method used
+Advantages
+Disadvantages
+Perturbation-based Techniques
+LIME [26]
+Local
+Model-
+Agnostic
+-Explain a prediction of a
+black-box model based on
+an instance.
+-Understanding
+the specific deci-
+sions of a model,
+-Detecting
+and
+fixing biases.
+-Computationally expensive,
+-Less effective for complex and high-
+dimensional data.
+SHAP [52]
+Local
+Model-
+Agnostic
+-Leverage contribution val-
+ues to explain the impor-
+tance of each feature to a
+model s output.
+-Applicable
+to
+any ML model.
+-Computationally expensive,
+-Need to be more scalable for highly
+complex models and large data,
+Less accurate explanation in complex
+models.
+CFE [59]
+Local/
+Global
+Model-
+Agnostic
+-Use generated hypotheti-
+cal scenarios to understand
+how the model s output is
+affected by changes in input
+data.
+-Offer
+valuable
+insights into the
+decision-making
+process
+of
+a
+model.
+-Computationally expensive to gener-
+ate counterfactuals,
+-Limited to individual instances and
+does not dicuss a general behavior of
+the model,
+-Not consistent if the training data are
+incomplete or biased,
+-Sensitive to ethical concerns if coun-
+terfactuals make suggestions.
+Gradient-based methodology
+Saliency
+Map [60]
+Local/
+Global
+Model-
+Agnostic
+-Highlight important fea-
+tures by obtaining output s
+gradients for input image,
+-Visualize the most signif-
+icant regions of that image
+for the model s prediction.
+-Quick insights
+-Applicable
+to
+various models
+-Sensitive to noise in the input data,
+-Only applicable to gradient-based
+models,
+-Sometimes ambiguous, where multi-
+ple features are highlighted, particu-
+larly in complex images.
+LRP [62]
+Local/
+Global
+Model-
+specific
+-Explain each input fea-
+ture s contribution to the
+model s output by assign-
+ing a relevance score to
+each neuron.
+-Faithful,
+-Does not intro-
+duce
+any
+bias
+into the explana-
+tion.
+-Complex to implement and interpret,
+-Computationally expensive for large
+and complex models,
+-Only applicable to backpropagation-
+based models,
+-Lack of standardization,
+-Inconsistent
+explanations
+through
+different implementations.
+CAM [63]
+Local
+Model-
+Specific
+-Explain
+predictions
+of
+CNN by indicating which
+regions of the input image
+the model is focusing on,
+or it can simply provide a
+heatmap for the output of
+the convolutional layer.
+-A valuable XAI
+technique for un-
+derstanding
+the
+decision-making
+process
+of
+DL
+models
+applied
+to image data.
+-Requires access to the architecture
+and weights of the model used.
+Integrated
+Gradients
+[64]
+Local
+Model-
+Specific
+-Attribution methods must
+adhere to Sensitivity and
+Implementation Invariance
+axioms.
+-Satisfies several
+important
+prop-
+erties,
+-Applies to any
+models.
+-Sensitivity to initialization
+-Computational intensity
+LRP-
+Con-
+serva-
+tion [55]
+Local
+Model-
+Specific
+-Explain predictions of the
+Transformers
+-Granular
+in-
+sights
+-Clear attribution
+-Complexity and computational cost
+13
+The success of XAI techniques used in NLP applications is
+heavily dependent on the quality of preprocessing and the type
+of text data used [2, 85]. This is important because XAI is
+critical to developing reliable and transparent NLP models that
+can be employed for real-world applications by allowing us to
+understand how a model arrived at a particular decision. This
+section reviews some of the most common XAI techniques for
+NLP. Figure 9 presents a taxonomy of NLP explainability.
+Figure 9: Taxonomy of explainability in natural language processing.
+5.1.1. Explaining Neural Networks and Fine-Tuned Trans-
+former Models: Insights and Techniques
+Transparent models are easy to interpret because their inter-
+nal mechanisms and decision-making processes are designed
+to be inherently understandable [10]. Perturbation-based and
+gradient-based techniques are the most commonly employed
+approaches for explaining neural network-based models and
+fine-tuned transformer-based models. In this subsection, we
+discuss some of the most common XAI techniques for neural
+network-based models and fine-tune Transformer-based mod-
+els, used in NLP.
+LIME: Discussed in Subsection 4.1.1, selects a feature, such
+as a word, from the original input text data and generates many
+perturbations around that feature by randomly removing or re-
+placing other features (i.e., other words). LIME trains a sim-
+pler and explainable model using the perturbed data to generate
+feature importance scores for each word in the original input
+text [26]. These scores indicate the contribution of each word
+to the black-box model prediction. LIME identifies and high-
+lights the important words to indicate the impact of the model s
+prediction, as shown in Figure 10.
+Figure 10: LIME feature importance scores visualization.
+SHAP: SHAP [52] is a widely-used XAI technique in NLP
+such as text classification, sentiment analysis, topic modeling,
+named entity recognition, and language generation [51, 86].
+SHAP computes the feature importance scores by generating
+a set of perturbations that remove one or more words from the
+input text data. For each perturbation, SHAP computes the dif-
+ference between the expected model output when the word is
+included or not included, which is known as the Shapley value.
+This approach then computes the importance of each word in
+the original input text by combining and averaging the Shap-
+ley values of all the perturbations. Finally, SHAP visualizes
+the feature importance scores to indicate which words are more
+useful in the model prediction process.
+LRP: To apply LRP to NLP, one must encode preprocessed
+input text as a sequence of word representations, such as word
+embeddings, and feed them to a neural network [87]. The net-
+work processes the embeddings using multiple layers and pro-
+duces the model s prediction. LRP then computes the relevance
+scores by propagating the model s output back through the net-
+work layers. The relevance score for each word is normalized
+using the sum of all relevance scores and multiplied by the
+weight of that word in the original input text. This score re-
+flects its contribution to the final prediction.
+Integrated Gradients: Integrated Gradients are used in NLP
+tasks such as text classification, sentiment analysis, and text
+summarization [88]. The Integrated Gradients technique com-
+putes the integral of the gradients of the model s prediction with
+the corresponding input text embeddings along the path from
+a baseline input to the original input. The baseline input is
+a neutral or zero-embedding version of the input text that has
+no relevant features for the prediction task. The difference be-
+tween the input word embeddings and the baseline embeddings
+is then multiplied by the integral to find the attribution scores
+for each word, which indicate the relevance of each word to the
+model s prediction. Integrated Gradients output a heatmap that
+highlights the most important words in the original input text
+based on the attribution scores [66]. This provides a clear visu-
+alization of the words that were most significant for the model s
+prediction, allowing users to understand how the model made
+that particular decision. IG can be used to identify the most
+important features in a sentence, understand how the model s
+predictions change when different input features are changed,
+and improve the transparency and interpretability of NLP mod-
+els [89].
+5.1.2. Prompt-Based Explainability for Transformer Models
+In this subsection, we discuss some of the most com-
+mon prompt-based explanation techniques, including Chain
+of Thought (CoT), In-Context Learning (ICL), and interactive
+prompts.
+Chain of Thought: In the context of a large language model
+(LLM) such as GPT-3[90], Chain of Thought prompts refer to
+the input sequences intended to instruct the model using a se-
+ries of intermediate reasoning steps to generate a coherent out-
+put [91, 92]. This technique helps enhance task performance
+by providing a clear sequence of reasoning steps, making the
+model s thought process more understandable to the audience
+14
+[93]. The gradient-based studies explored the impact of change-
+of-thought prompting on the internal workings of LLMs by in-
+vestigating the saliency scores of input tokens [94]. The scores
+are computed by identifying the input tokens (words or phrases)
+and inputting them into the model to compute the output. The
+influence of each token is then calculated through backpropaga-
+tion, utilizing the gradients of the model. The score reveals the
+impact of each input token on the model s decision-making pro-
+cess at every intermediate step. By analyzing the step-by-step
+intermediate reasoning, users can gain a better understanding
+of how the model arrived at its decision, making it easier to
+interpret and trust the model s outputs.
+Perturbation-based studies on Chain of Thought explanation
+through the introduction of errors in few-shot prompts have pro-
+vided valuable insights into the internal working mechanism
+behind large language models [95, 96]. Counterfactual prompts
+have been suggested as a method of altering critical elements
+of a prompt, such as patterns and text, to assess their impact
+on the output [95]. The study demonstrated that intermediate
+reasoning steps primarily guide replicating patterns, text, and
+structures into factual answers. Measuring the faithfulness of
+a CoT, particularly within the context of LLMs, involves as-
+sessing the accuracy and consistency with which the explana-
+tions and reasoning process align with established facts, logical
+principles, and the predominant task objectives [97]. Several
+key factors are crucial when evaluating CoT faithfulness, in-
+cluding logical consistency, factuality, relevance, completeness,
+and transparency [97]. The assessment often requires qualita-
+tive evaluations by human judges and quantitative metrics that
+can be automatically calculated. The development of models
+to measure faithfulness and the design of evaluation methods
+remains an area of active research.
+Explaining In-Context Learning: In-context learning is a
+powerful mechanism for adapting the model s internal behav-
+ior to the immediate context provided in the input prompt. ICL
+operates by incorporating examples or instructions directly into
+the prompt, guiding the model toward generating the desired
+output for a specific task. This approach enables the model to
+understand and generate responses that are relevant to the speci-
+fied task by leveraging the contextual prompts directly from the
+input. Several studies have focused on the explainability of how
+in-context learning influences the behavior of large language
+models, applying various techniques and experimental setups
+to elucidate this process. A recent study explores a critical as-
+pect of how ICL operates in large language models, focusing
+on the balance between leveraging semantic priors from pre-
+training and learning new input-label mappings from examples
+provided within prompts [98]. The study aims to understand
+whether the LLMs  capability to adapt to new tasks through
+in-context learning is primarily due to the semantic priors ac-
+quired during pre-training or if they can learn new input-label
+mappings directly from the examples provided in the prompts.
+The experimental results revealed nuanced capabilities across
+LLMs of different sizes.
+Larger LLMs showed a remarkable capability to override
+their semantic priors and learn new, contradictory input-label
+mappings. In contrast, smaller LLMs rely more on their se-
+mantic priors and struggle to learn new mappings through the
+flipped labels. This learning capability demonstrates symbolic
+reasoning in LLMs that extends beyond semantic priors, show-
+ing their ability to adapt to new, context-specific rules in input
+prompts, even when these rules are completely new or contra-
+dict pre-trained knowledge. Another study explores the work-
+ings of ICL in large language models by employing contrastive
+demonstrations and analyzing saliency maps, focusing on sen-
+timent analysis tasks [99]. In this research, contrastive demon-
+strations involve manipulating the input data through various
+approaches, such as flipping labels (from positive to negative or
+vice versa), perturbing input text (altering the words or struc-
+ture of the input sentences without changing their overall senti-
+ment), and adding complementary explanations (providing con-
+text and reasons along with the input text and flipped labels).
+Saliency maps are then applied to identify the parts of the input
+text that are most significant to the model s decision-making
+process. This method facilitates visualization of the impact that
+contrastive demonstrations have on the model s behavior. The
+study revealed that the impact of contrastive demonstrations on
+model behavior varies depending on the size of the model and
+the nature of the task. This indicates that explaining in-context
+learning s effects requires a nuanced understanding that consid-
+ers both the model s architectural complexities and the specific
+characteristics of the task at hand.
+ICL allows large language models to adapt their responses to
+the examples or instructions provided within the input prompts.
+Explainability efforts in LLMs aim to reveal how these models
+interpret and leverage in-context prompts, employing various
+techniques, such as saliency maps, contrastive demonstrations,
+and feature attribution, to shed light on LLMs  decision-making
+processes. Understanding the workings of ICL in LLMs is cru-
+cial for enhancing model transparency, optimizing prompt de-
+sign, and ensuring the reliability of model outputs across vari-
+ous applications.
+Explaining Interactive Prompt:
+Explaining Interactive
+Prompt is a technique that focuses on designing and us-
+ing prompts to interact effectively with large language mod-
+els [92, 100]. This method involves designing prompts that
+dynamically direct the conversation toward specific topics or
+solicit explanations. Through the use of strategically designed
+prompts, users can navigate the conversation with a model to
+achieve more meaningful and insightful interactions, enhanc-
+ing the understanding of the model s reasoning and decision-
+making process.
+Several studies use various approaches to analyze and en-
+hance the effectiveness of explaining interactive prompts. A
+study called TalkToModel introduced an interactive dialogue
+system designed to explain machine learning models under-
+standable through natural language conversations or interactive
+prompts [100]. It evaluates the system s language understand-
+ing capabilities, increasing deeper and more meaningful inter-
+actions between users and models through interactive prompts.
+This approach enhances the interpretability of complex ma-
+chine learning models  behaviors and the model s decision-
+making process. The study called Prompt Pattern Catalog in-
+troduced a catalog designed to enhance prompt engineering by
+15
+systematically organizing and discussing various strategies for
+constructing prompts [92]. This catalog aims to explain the
+decision-making process of models more clearly. It provides
+insights and methodologies for eliciting detailed, accurate, and
+interpretable responses from models, thus improving the under-
+standing of model behavior and decision-making logic.
+5.1.3. Attention Mechanism
+Attention mechanisms in the Transformer architecture enable
+a model to focus selectively on different parts of the input se-
+quence for each step of the output sequence, mimicking the way
+humans pay attention to specific parts of a sentence [56]. Atten-
+tion weights can be visualized to gain insights into the model s
+decision-making process, revealing which parts of the input it
+considers significant. This visualization aids in understanding
+how the model makes its decisions and explains the significance
+assigned to various input segments, thereby enhancing the in-
+terpretability and transparency of black-box models. Attention-
+Viz [101], a visualization method for self-attention, highlights
+query and key embeddings, enabling global pattern analysis
+across sequences and revealing deeper insights into Transform-
+ers  pattern identification and connection beyond previous visu-
+alization methods. Another study introduces a method for ex-
+plaining predictions made by Transformer-based models, par-
+ticularly those using multi-modal data and co-attention mech-
+anisms [65]. This method provides generic explainability so-
+lutions for the three most common components of the Trans-
+former architectures: pure self-attention, a combination of self-
+attention and co-attention, and encoder-decoder attention.
+5.2. Explainability in Computer Vision
+In computer vision, models can be categorized into Convo-
+lutional Neural Network-based models (CNNs) and attention-
+based models, such as Vision Transformers (ViTs), based on
+their architecture. Accordingly, various XAI approaches are de-
+signed to work with these model architectures. For CNNs, tech-
+niques such as saliency maps, LRP, Integrated Gradients, and
+CAM are the most commonly employed. On the other hand,
+for ViTs, methods like attention visualization, Attention Roll-
+out, Attention Flow, Counterfactual Visual Explanations, and
+Feature Attribution are extensively used. Figure 11 presents a
+taxonomy of vision explainability.
+5.2.1. Explainability of CNNs
+Saliency Maps: In computer vision, a saliency map helps
+identify the most important regions of an image for a deep
+learning model s prediction. Various methods have been pro-
+posed to obtain a saliency map, including deconvolutional net-
+works, backpropagation, and guided backpropagation algo-
+rithms [60, 102, 103]. To generate the saliency map, a pre-
+processed input image is fed into a pre-trained CNN model to
+obtain the probability distribution over various classes of the
+trained model. The output probability gradients are then com-
+puted using the backpropagation approach, with higher gradient
+values indicating the relevance of each pixel to the model s pre-
+diction. The saliency map detects the highest gradient value
+Figure 11: Taxonomy of explainability in computer vision.
+pixels as the most important for the model s prediction, gener-
+ating a heatmap that highlights these regions in the input image.
+The resulting saliency heatmap provides important insights into
+the CNN and aids in interpreting its decision-making processes.
+The saliency map method removes less relevant regions (pix-
+els), such as the image background, and identifies the most
+important regions of the input image for the model s decision.
+However, it is important to note that the saliency map only pro-
+vides a local explanation by highlighting specific pixels of the
+input image and does not provide a global explanation.
+Class Activation Maps: CNNs are powerful neural models
+for image processing tasks, achieving state-of-the-art perfor-
+mance in various applications such as object recognition, seg-
+mentation, and detection [104, 105]. However, their complex
+architecture and the high dimensionality of their learned fea-
+tures make it challenging to understand how they make deci-
+sions. Using CAM for explaining the behavior of CNN mod-
+els is popular [106]. The CNN model is first trained with pre-
+processed and labeled image data for image classification tasks.
+A weighted feature map is obtained by multiplying the fea-
+ture map from the final convolutional layer with channel impor-
+tance, which highlights the important regions of the input im-
+age. The weighted feature map is then passed through a ReLU
+activation function to keep only positive values. The resulting
+positively weighted feature map is up-sampled to match the size
+of the input image. Finally, CAM provides a visual output, as
+shown in Figure 12, by highlighting the most important regions
+of the original input image using this up-sampled feature map
+[63, 107]. CAM does not give specific information on a partic-
+ular pixel and how that pixel is important to the model s pre-
+diction. Nevertheless, this technique can be a valuable tool for
+interpreting CNNs and enhancing their interpretability. Conve-
+niently, it can additionally be used to improve the robustness of
+the model by identifying the parts of the images that are irrele-
+vant to the prediction and discarding them [108].
+Layer-wise Relevance Propagation: LRP computes the rel-
+evance scores for each pixel in an image by propagating a clas-
+sification model s output back through the network layers. The
+relevance score determines the contributions of each pixel to the
+final model s prediction [61, 109]. LRP visualizes the weighted
+relevance scores as a heat map and highlights pixels in the in-
+16
+Figure 12: Visualization of CAM (input image from CIFAR 10 dataset).
+put image to indicate the most important pixels for the model s
+prediction. The primary advantage of LRP for image classifica-
+tion tasks is its ability to assign a relevance score for each pixel
+from the input image, allowing us to understand how much each
+pixel contributed to the model s output. LRP provides valuable
+information to interpret the model, offering insights into which
+pixels are most important for the final prediction. By analyzing
+the relevance score, LRP helps interpret and understand how the
+model made the decision and produced the output. Addition-
+ally, LRP provides insight into each internal layer s inner work-
+ings, offering valuable insights into understanding the internal
+workings of DNN and improving the model s performance.
+5.2.2. Explainability of Vision Transformers
+Vision Transformers (ViTs) are a category of deep learning
+models that adapt the Transformer architecture to the domain
+of image recognition tasks [110]. These models handle images
+as sequences of patches and treat each patch similarly to how
+tokens are treated in NLP.
+Feature Attribution Techniques: Gradient-based Saliency
+Maps, Integrated Gradients, CAM, and LRP are among the
+most common feature attribution techniques employed to ex-
+plain the decision-making process of complex models such as
+CNNs and ViTs. Saliency Maps identify the pixels most signif-
+icant to the model s output [102]. Integrated Gradients trace the
+contribution of each feature from a baseline to the actual input
+[88]. LRP backpropagates the output decision to assign rele-
+vance scores to individual input features [54]. CAM provides a
+visual representation of which regions in the input image were
+most relevant to a particular class by highlighting them [104].
+Thus, all these approaches provide insights into the model s fo-
+cus areas for specific features or regions.
+Attention Rollout and Attention Flow Methods:
+These
+are
+Transformer
+explainability
+approaches
+designed
+for
+Transformer-based models [69]. They are designed to track and
+understand the flow of information from individual input fea-
+tures through the network s self-attention mechanism. These
+approaches help interpret the complexity of ViTs by addressing
+layer-wise information mixing. They provide deeper insights
+into the decision-making process of the model by offering im-
+proved methods for understanding how information from input
+features is processed and integrated across the network s layers.
+Attention Visualization: Transformer Interpretability Be-
+yond Attention Visualization is an advanced Transformer ex-
+plainability technique that interprets the decision-making pro-
+cess of Transformers, including ViT [54]. This method extends
+beyond traditional attention mechanism visualizations to reveal
+the nuanced roles of individual neurons, the strategic influence
+of positional encodings, and the intricate layer-wise interactions
+within the Transformer. Examining the comprehensive func-
+tionalities and contributions of various transformer components
+aims to provide a more complete explanation of the model s
+behavior than attention weights alone can provide. This holis-
+tic approach enhances our understanding and interpretability of
+how these models process input features and make decisions.
+Counterfactual Visual Explanations: Counterfactual Visual
+Explanations (CVE) is a vision interpretability technique de-
+signed to explain the decision-making processes of ViT models.
+This method involves changing specific parts of an input image
+and observing the subsequent changes in the model s output
+[111, 112]. This allows people to identify which image fea-
+tures are most significant in the model s decision-making pro-
+cess. CVE is a practical and insightful approach to understand-
+ing how ViT models process and interpret images, providing a
+tangible means to explore and improve these complex models 
+interpretability.
+5.2.3. Model-agnostic Explainer for Vision Models
+Model-agnostic approaches, such as LIME and SHAP, have
+also been adapted to approximate ViTs  behavior with more in-
+terpretable models, which is particularly useful for individual
+predictions.
+This adaptation process requires considerations
+such as the computational complexity due to the Transformer
+structure, which may affect the feature attribution, the high di-
+mensionality of image data, the dependency between input fea-
+tures in image data, which violates the independence assump-
+tion in SHAP, and the choice of an appropriate surrogate model
+that balances fidelity to the original model with interpretability.
+5.3. Explainability in Time Series
+Time series forecasting models are widely used in various
+domains, such as business, finance, meteorology, and medicine,
+to predict the future values of a target variable for a given en-
+tity at a specific time [113, 114]. Time series data refer to an
+ordered sequence of collected data points accumulated during
+regularly spaced time intervals. The predictive power of time
+series forecasting models is rooted in statistical and ML tech-
+niques that analyze historical data. However, these models can
+be complex, unintuitive, and opaque, requiring the use of XAI
+to ensure fairness and trustworthiness, as well as to improve
+their accuracy [115]. The XAI techniques can be used to iden-
+tify bias in the data, improve the accuracy of predictions, and
+make the model more interpretable. For instance, XAI can be
+used to identify whether the model is biased against certain
+groups of patients, improve the accuracy of the model s pre-
+dictions by identifying the most important features for its pre-
+dictions, and provide explanations for the model s predictions.
+17
+The use of time series forecasting models is ubiquitous in
+real-world datasets. Accurate time series forecasting of stock
+prices, for example, can inform investment decisions and aid in
+risk management [116]. In meteorology and climate science,
+accurate time series forecasting can aid in weather prediction
+and disaster risk management [117].
+Devices, such as sen-
+sors, accurately record data points with time signatures for use
+in a combination of statistical and ML techniques to analyze
+historical data and make forecasts about future values. How-
+ever, these models face challenges due to outliers, seasonal pat-
+terns, temporal dependencies, and missing data, among other
+factors. Therefore, the quality of the data and model architec-
+ture choices play a vital role in the accuracy of time series pre-
+dictions, necessitating the use of XAI to provide human under-
+standing of the models  performance.
+5.3.1. Saliency Maps
+Generating saliency maps for time series data involves sev-
+eral essential preprocessing steps. Normalization is employed
+to ensure that all features are on the same scale, facilitating fair
+comparisons between them. Reshaping transforms the data into
+a structured representation, where each row corresponds to a
+time step, and each column represents a feature. Windowing
+and padding are crucial to capture local relationships within the
+data [118], enabling the model to discern patterns and depen-
+dencies. The resulting saliency map assigns a value to each
+time step in the input time series, with higher values indicating
+greater model reliance on that particular time step. This visu-
+alization aids in comprehending the interplay among various
+features and their impact on the final prediction [119].
+Saliency maps face challenges in accurately identifying fea-
+ture importance over time and sensitivity to the underlying
+model architecture [120].
+Although the concept of saliency
+maps is model-agnostic, their specific implementation tends to
+be model-specific, which underscores their role as a valuable
+output standard for other XAI techniques [121]. In analyzing
+time series data, saliency maps offer potential insights into the
+decision-making process, facilitating the identification of data
+or model-related issues. However, their dependence on model
+architecture emphasizes the need to complement their usage
+with other XAI techniques in comprehensive data analysis.
+5.3.2. CAM
+Although originally designed for image data, CAMs [63] can
+be applied to time series data by treating each time step as a sep-
+arate  channel  in an image, similar to different color channels,
+such as red, green, and blue [122]. The time series can be win-
+dowed of fixed size and then stacked as different channels in
+the image. The size of the windows can be chosen based on
+the length of the time series and the desired level of detail. For
+example, if the time series is 1,000 time steps long, you could
+use windows of size 100 time steps. The windows can be over-
+lapped by a certain amount.
+The last convolutional layer is then used to compute a
+weighted sum of the feature maps, which is upsampled to the
+original image size to generate the CAM. This technique uti-
+lizes the weights from the global average pooling (GAP) layer
+to identify the segments of the time series, which are then used
+to produce the saliency mapping of the weight vector to the
+original time series for visualization and easier explainabil-
+ity. In addition to CAM, there are other approaches for vi-
+sualizing the intermediate activations of a DNN that utilizes
+convolutional layers and GAP layers before the final output
+layer [103, 123], and the visualization technique called De-
+convolutional Networks [102]. Deconvolutional Networks can
+be repurposed for time series data by treating sequential data
+points as channels, which enables the visualization and compre-
+hension of hierarchical features learned by convolutional layers
+in a time series-specific context [124].
+5.3.3. TSViz
+TSViz (Time Series Visualization) is a model-agnostic set
+of visualization techniques that help users explore and com-
+prehend complex time series data, regardless of the type of
+model used for analysis [125].
+This XAI technique uses
+various dimensionality reduction techniques, such as princi-
+pal component analysis (PCA [126]), t-distributed stochastic
+neighbor embedding (t-SNE [127]), and uniform manifold ap-
+proximation and projection (UMAP [128]), to simplify high-
+dimensional time series data and generate visualizations that
+reveal trends, patterns, and correlations [129, 130]. These tech-
+niques are especially useful for identifying complex relation-
+ships that might be difficult to detect with traditional visualiza-
+tion methods [131].
+TSViz is a post-hoc, human-in-the-loop XAI tool that sup-
+ports analysis and decision-making by human experts [125].
+Human interpretation and input are essential for comprehend-
+ing the data and visualizations generated, and users are re-
+sponsible for determining metrics and making necessary adjust-
+ments to the model [132]. TSViz enhances users  ability to ana-
+lyze and model time-series data through various visualizations,
+including line plots, heatmaps, seasonal plots, autocorrelation
+plots, and spectral density plots. However, it does not replace
+the importance of human expertise and judgement required for
+effective decision-making and insight drawing [133]. Overall,
+TSViz is an essential tool that empowers users to make data-
+driven decisions and predictions, gain a deeper understanding
+of underlying systems and phenomena, and identify potential
+sources of bias in their models.
+5.3.4. LIME
+Applying LIME to time series data introduces a unique set
+of challenges stemming from the inherent temporal dependen-
+cies within such data. In contrast to static tabular data, time
+series data necessitates an understanding of how events evolve
+over time. By crafting local, interpretable models that approx-
+imate black-box model predictions within specific time seg-
+ments, LIME equips analysts with a powerful tool for decipher-
+ing the temporal nuances that influence outcomes [134]. One
+way to do this is to use a sliding window of fixed length that
+moves along the time series data, or to use an attention mech-
+anism that identifies which parts of the time series are most
+relevant to the prediction at each time point [135].
+18
+Let s consider a specific example: a prediction model for the
+stock price on a particular day is explained using LIME [136].
+The most important time steps for the prediction is identified
+by obtaining feature importance scores or time series cross-
+validation. For example, we may find that the previous day s
+stock price, trading volume, and news articles are the most im-
+portant features. Next, the time series is perturbed by randomly
+changing the values of the most important time steps.
+The
+amount of change is controlled by a hyperparameter to reduce
+noise in the local model [51]. The perturbed time series is fed to
+the black-box model and records the corresponding predictions.
+This process is repeated for multiple perturbed instances. Then,
+we train a local, interpretable model using the perturbed time
+series and their associated predictions. The coefficients of the
+model can be examined to identify the most important features.
+For instance, the previous day s stock price has the highest co-
+efficient, indicating that it is the most important feature for the
+prediction. Finally, the coefficients of the local model are used
+to explain the model s prediction. If the coefficients show that
+the previous day s stock price was the most important feature,
+we can say that the black-box model predicted the stock price
+based on the previous day s price.
+5.3.5. SHAP
+SHAP can be seamlessly applied to time series data, where it
+offers valuable global insights into a model s decision-making
+process over time. This capability aids in comprehending the
+evolving behavior of time series models and the identification
+of trends or patterns influencing predictions.
+First, we train a time series model on a dataset of historical
+time series data. Once the model is trained, we can use SHAP
+to explain the output of the model for a new time series. To do
+this, we need to calculate the SHAP values for each feature in
+the time series. For time series data, each feature corresponds to
+a specific time step in the time series. To calculate the Shapley
+values for a time series, we create a dataset that contains pertur-
+bations of the original time series. Each perturbation consists of
+a modified version of the original time series where the value of
+one time step is changed while keeping the values of all other
+time steps fixed. These differences are used to calculate the
+Shapley values for each time step in the time series. The Shap-
+ley values can be used to understand how the model works and
+to identify the most important features for the prediction. For
+example, we can plot the Shapley values for each time step in
+the time series to visualize the contribution of each time step to
+the model s output.
+5.4. Explainability in Healthcare
+Healthcare is a critical domain due to the high risks and com-
+plexities of the medical decision-making process. For example,
+a study has found that human surgeon usually explains the de-
+tails of the surgery beforehand and has a 15% chance of causing
+death during the surgery. A robot surgeon has only a 2% chance
+of death. A 2% risk of death is better than a 15% risk, but people
+prefer the human surgeon [137]. The challenge is how to make
+the physicians and patients trust the deployed AI model within
+the robot. How much communication and explanation between
+a robot, patient, or physician is sufficient? The power of XAI
+comes here to provide transparent, understandable, and inter-
+pretable explanations for the AI model decisions to build trust
+between them. Hence, XAI is necessary in healthcare due to
+its role in enhancing trust and confidence, ensuring faithfulness
+to ethical considerations, managing regulatory compliance, im-
+proving clinical decision-making, facilitating ongoing learning
+and model fine-tuning, improving risk management and analy-
+sis, and enhancing collaborative communications between clin-
+icians, patients, and AI models [138]. XAI has several crucial
+applications in various aspects of healthcare, such as medical
+diagnosis, patient treatment, drug discovery and development,
+clinical decision support, and risk assessment.
+Medical diagnosis: Medical data in healthcare are diverse
+and sophisticated, incorporating various types and sources, in-
+cluding imaging (like MRIs, CT scans, and X-rays), electronic
+health records, genomic data, laboratory test results, patient-
+reported data, wearable device data, social and behavioral data,
+and pharmacological data. XAI improves disease diagnostics
+by providing transparent interpretations of AI model decisions,
+ensuring accurate disease identification, and predicting patient
+outcomes through comprehensible explanations of the model
+outputs for these complex medical data [22, 139]. XAI also
+helps identify influential features from the complex medical
+data affecting the model decision-making process [18].
+Patient treatment: By examining the explanations of unique
+health data, XAI helps design treatment plans for individual pa-
+tients. It provides good insights into why a specific medicine
+is suggested based on a patient s medical data and diagno-
+sis [156].
+Drug discovery and development: XAI plays a vital role
+in drug discovery and development in the pharmaceutical in-
+dustry [157]. It explains and provides insights into complex
+relationships among the molecular structures of drugs and their
+biological effects [158].
+Clinical decision support: XAI systems assist healthcare
+professionals by providing transparent and interpretable expla-
+nations of the decision-making processes of models handling
+complex data [159].
+Clinicians can more easily understand
+complex cases by considering the influential features high-
+lighted in the explanations provided by XAI systems [20].
+Legal considerations: The use of XAI in healthcare raises
+several legal considerations. The model decision-making pro-
+cess and how and why the model made that decision should be
+transparent and understandable for healthcare professionals and
+patients [22]. XAI systems should be ensured and safeguarded
+for the privacy and security of medical and patient data [160].
+XAI systems mitigate the biases and ensure that AI-made deci-
+sions are fair and reasonable across diverse patients [22]. Reg-
+ulatory transparency and audits [161], medical device regula-
+tions [162], informed consent [163], liability and malpractice
+concerns [164], and intellectual property rights [21] are among
+the most critical legal considerations in the application of XAI
+in healthcare.
+Ethical considerations: The ethical considerations of XAI
+in healthcare are complicated and significant [165, 166]. It fo-
+19
+Table 3: Summarize XAI techniques in Healthcare.
+No. Data
+Type
+Medical data
+XAI Techniques
+Application Areas
+Benefits
+Papers
+1
+Image
+X-rays,
+ultra-
+sound, MRI and
+CT scans, etc
+LRP,
+LIME,
+CAM,
+Saliency Maps,
+and
+Integrated Gradients
+Radiology,
+Pathology,
+Dermatology,
+Ophthal-
+mology, and Cardiology
+Interpretable
+image anal-
+ysis
+[140,
+141,
+142, 143]
+2
+Text
+Clinical
+text,
+Electronic Health
+Records (EHRs),
+and case studies
+LIME, SHAP, Atten-
+tion Mechanism, and
+Counterfactual Expla-
+nations
+Drug Safety, and Medical
+Research
+Interpretable
+text analysis
+[144,
+145,
+146]
+3
+Structured
+(Nu-
+meric)
+Patient
+de-
+mographics,
+laboratory
+test
+results, pharmacy
+records,
+billing
+and claims
+LIME, SHAP, Deci-
+sion Trees, Rule-based
+Systems, Counterfac-
+tual
+Explanations,
+Integrated
+Gradients,
+and BERT Explana-
+tions
+Patient Health Monitor-
+ing and Management, Epi-
+demiology, and Clinical
+Trials and Research
+Interpretable
+structured
+data
+analy-
+sis
+[7, 146, 147]
+4
+Time se-
+ries
+ECGs,
+EEGSs,
+monitoring
+and
+wearable
+device
+data
+TSViz, LIME, CAM,
+SHAP, Feature Impor-
+tance, and Temporal
+Output Explanation
+Neurology
+and
+EEG
+Monitoring, Patient Mon-
+itoring in Critical Care,
+and Cardiology and Heart
+Health Monitoring
+Interpretable
+time
+series
+analysis
+[148, 149]
+5
+Multi-
+modal
+Telemedicine
+interactions (text,
+audio, video)
+LIME,
+SHAP,
+At-
+tention
+Mechanisms,
+Multi-modal
+Fusion
+and
+Cross-modal
+Explanations
+Cancer
+Diagnosis
+and
+Treatment, Neurology and
+Brain Research, and Men-
+tal Health and Psychiatry
+Interpretable
+multi-modal
+analysis
+[150, 151]
+6
+Genetic
+Genetic makeup
+Sensitivity
+Analysis,
+LIME,
+SHAP,
+and
+Gene
+Expression
+Network Visualization
+Genomic Medicine, On-
+cology, and Prenatal and
+Newborn Screening
+Interpretable
+genetic
+analysis
+[152, 153]
+7
+Audio
+Heart and lung
+sounds
+Saliency Maps, LRP,
+SHAP,
+LIME,
+and
+Temporal
+Output
+Explanation
+Cardiology, Pulmonology,
+Mental Health, and Sleep
+Medicine
+Interpretable
+audio analy-
+sis
+[154, 155]
+cuses on the sensitivity and importance of medical information,
+the decision of the AI model, and the explanations of the de-
+ployed XAI system. Transparency and accountability [22], fair-
+ness and bias mitigation [165], ethical frameworks and guide-
+lines [167], privacy and confidentiality [168] are some of the
+key ethical aspects of XAI in healthcare. Medical data are com-
+plex and diverse, requiring the use of a variety of XAI tech-
+niques to interpret it effectively. Table 3 summarizes various
+XAI techniques and their application areas in healthcare. XAI
+faces several challenges in healthcare, such as the complexity
+and diversity of medical data, the complexity of AI models,
+updating XAI explanations in line with the dynamic nature of
+healthcare, the need for domain-specific knowledge, balancing
+accuracy and explainability, and adhering to ethical and legal
+implications [169, 21].
+5.5. Explainability in Autonomous Vehicles
+Autonomous vehicles use complex and advanced AI systems
+by integrating several deep-learning models that can handle var-
+ious data types, such as images, videos, audio, and informa-
+tion from LIDAR and radar [170]. These models utilize inputs
+from diverse sources, including cameras, sensors, and GPS, to
+deliver safe and accurate navigation. A crucial consideration
+is determining which data are most critical. What information
+takes precedence, and why? Understanding the importance of
+different data types is key to enhancing our models and learn-
+ing effectively from the gathered information [171]. To address
+these questions and better decision-making processes of black-
+box AI models, developers use the XAI approach to evaluate
+the AI systems. Implementing XAI in autonomous vehicles
+significantly contributes to human-centered design by promot-
+ing trustworthiness, transparency, and accountability. This ap-
+proach considers various perspectives, including psychological,
+sociotechnical, and philosophical dimensions, as highlighted in
+20
+Shahin et al. [172]. Table 4 shows a summary of various XAI
+techniques in autonomous vehicles, including visual, spatial,
+temporal, audio, environmental, communication, genetic, and
+textual. The advancements significantly enhance the AI-driven
+autonomous vehicle system, resulting in a multitude of com-
+prehensive, sustainable benefits for all stakeholders involved,
+as follows.
+Trust: User trust is pivotal in the context of autonomous
+vehicles. Ribeiro et al. [26] emphasized this by stating:  If
+users do not trust a model or its predictions, they will not use
+it . This underscores the essential need to establish trust in the
+models we use. XAI can significantly boost user trust by pro-
+viding clear and comprehensible explanations of system pro-
+cesses [173]. Israelson et al. [174] highlighted the critical need
+for algorithmic assurance to foster trust in human-autonomous
+system relationships, as evidenced in their thorough analysis.
+The importance of transparency in critical driving decisions,
+noting that such clarity is crucial for establishing trust in the
+autonomous capabilities of self-driving vehicles [175].
+Safety and reliability: These are critical components and
+challenges in developing autonomous driving technology [176].
+Under the US Department of Transportation, the American Na-
+tional Highway Traffic Safety Administration (NHTSA) has es-
+tablished specific federal guidelines for automated vehicle pol-
+icy to enhance traffic safety, as outlined in their 2016 policy
+document [177]. In a significant development in March 2022,
+the NHTSA announced a policy shift allowing automobile man-
+ufacturers to produce fully autonomous vehicles without tradi-
+tional manual controls, such as steering wheels and brake ped-
+als, not only in the USA but also in Canada, Germany, the UK,
+Australia, and Japan [172]. Following this, The International
+Organization for Standardization (ISO) responded by adopting
+a series of standards that address the key aspects of automated
+driving. These standards are designed to ensure high levels of
+safety, quality assurance, efficiency, and the promotion of an
+environmentally friendly transport system [178]. Besides, Kim
+et al. [179, 180] described the system s capability to perceive
+and react to its environment: The system can interpret its oper-
+ational surroundings and explain its actions, such as  stopping
+because the red signal is on .
+Regulatory compliance and accountability: Public insti-
+tutions at both national and international levels have responded
+by developing regulatory frameworks aimed at overseeing these
+data-driven systems [172]. The foremost goal of these regula-
+tions is to protect stakeholders  rights and ensure their authority
+over personal data. The European Union s General Data Protec-
+tion Regulation (GDPR) [181] exemplifies this, establishing the
+ right to an explanation  for users. This principle underscores
+the importance of accountability, which merges social expec-
+tations with legislative requirements in the autonomous driving
+domain. XAI plays a pivotal role by offering transparent and in-
+terpretable insights into the AI decision-making process, ensur-
+ing compliance with legal and ethical standards. Additionally,
+achieving accountability is vital for addressing potential liabil-
+ity and responsibility issues, particularly in post-accident in-
+vestigations involving autonomous vehicles, as highlighted by
+Burton et al. [182]. Clear accountability is essential to effec-
+tively manage the complexities encountered in these situations.
+Human-AI decision-making (collaboration): In recent au-
+tonomous vehicle systems, machine learning models are uti-
+lized to assist users in making final judgments or decisions,
+representing a form of collaboration between humans and AI
+systems [183]. With XAI, these systems can foster appropriate
+reliance, as decision-makers may be less inclined to follow an
+AI prediction if an explanation reveals flawed model reasoning
+[184]. From the users  perspective, XAI helps to build trust and
+confidence through this collaboration. In contrast, in terms of
+developers and engineers, XAI helps to debug the model, iden-
+tify the potential risks, and enhance the models and the vehicle
+technology [185].
+5.6. Explainability in AI for Chemistry and Material Science
+In chemistry and material science, AI models are becoming
+increasingly sophisticated, enhancing their capability to predict
+molecular structures, chemical reactions, and material behav-
+iors, as well as discover new materials [195]. Explainability
+in chemistry and material science increases beyond simply un-
+derstanding and analyzing model outputs; it encompasses un-
+derstanding the rationale behind the model predictions [196].
+XAI techniques play a crucial role in obtaining meaningful in-
+sights and causal relationships, interpreting complex molecular
+behaviors, optimizing material properties, and designing inno-
+vative materials through the application of AI models [197]. By
+explaining how and why machine learning models make pre-
+dictions or decisions, researchers and practitioners in the field
+can more confidently trust machine learning models for ana-
+lytical investigations and innovations. This understanding is
+important to increasing trust, facilitating insights and discov-
+eries, enabling validation and error analysis, and dealing with
+regulatory and ethical considerations in AI models [198]. The
+study,  CrabNet for Explainable Deep Learning in Materials
+Science  [199], focuses on improving the compositionally re-
+stricted attention-based network to produce meaningful mate-
+rial property-specific element representations. These represen-
+tations facilitate the exploration of elements  identities, similar-
+ities, interactions, and behaviors within diverse chemical envi-
+ronments [199]. Various model-agnostic and model-specific in-
+terpretability methods are employed in chemistry and material
+science to explain the prediction of black-box models  molec-
+ular structure, chemical reactions, and the relationship between
+chemical composition [200, 201, 202] and design of new mate-
+rials [197].
+5.7. Explainability in Physics-Aware AI
+Physics-aware artificial intelligence focuses on integrating
+physical laws and principles into machine learning models to
+enhance the predictability and robustness of AI models [203].
+Explainability in physics-aware AI is crucial for understanding
+and interpreting these models. It also bridges the gap between
+the black-box nature of AI models and physical understand-
+ing, making them more transparent and trustworthy [204]. Sev-
+eral approaches exist to explain physics-aware AI models [205].
+Domain-specific explanation methods are designed for specific
+21
+Table 4: Summarize XAI techniques in Autonomous Vehicles.
+No. Input Types
+Sources
+AI
+models
+XAI
+Techniques
+Key Benefits
+Papers
+1
+Visual Data
+Camera
+Images
+and
+Video
+Streams
+CNN,
+ViTs,
+RNN,
+or
+LSTM
+LRP,
+CAM,
+Saliency Maps,
+Integrated
+Gradients,
+Counterfactual
+Explanations
+Enhancing
+visual
+environmental
+inter-
+action,
+understanding dynamic driving
+scenarios,
+allowing correct object de-
+tection, interpreting real-time decision-
+making, and adaptive learning process by
+providing insights into AI s model predic-
+tion.
+[186,
+187]
+2
+Spatial Data
+LIDAR
+and
+Radar
+CNN,
+DNN
+Feature Impor-
+tance,
+SHAP,
+CAM,
+LRP,
+LIME
+Enhancing 3D space and object inter-
+actions, improving safety, security, reli-
+ability, design, development, and trou-
+bleshooting of the car by providing in-
+sights into the AI s spatial data processing
+and model decision-making
+[188,
+189]
+3
+Temporal
+Data
+(Time-
+Series)
+Sensor
+RNN,
+LSTM,
+GRU
+TSViz,
+LIME,
+CAM,
+SHAP,
+LRP
+Feature
+Importance,
+Temporal
+Out-
+put Explanation
+provides insights into time-series data for
+reliable decision-making, identifying po-
+tential safety issues, enhancing overall ve-
+hicle safety, and a deeper interpretation of
+the vehicle s actions over time for post-
+incident analysis
+[190,
+191]
+4
+Auditory
+Data
+Micro-
+phone
+CNN,
+RNN
+LRP,
+CAM,
+Saliency Maps,
+Attention Visu-
+alization
+enhancing the vehicle s ability to under-
+stand and react to auditory signals, im-
+proving safety and security by provid-
+ing insights into AI s audio data decision-
+making process
+[172]
+5
+Environmental
+Data
+(Weather
+&
+Geoloca-
+tion)
+GPS and
+Cloud-
+based
+services
+GNN,
+Random
+Forest,
+Gradient
+Boosting
+Rule-based
+Explanations,
+Decision Trees,
+SHAP,
+LIME,
+Counterfactual
+Explanations
+Enhanced
+decision-making,
+improving
+safety and efficiency, increasing safety,
+security,
+and
+reliability
+by
+providing
+insights into environmental factors and
+diverse conditions in the AI model s
+decision-making process
+[172,
+192]
+6
+Vehicle
+Telematics
+(engine & in-
+ternal status)
+Engine
+Control
+Unit,
+On-Board
+Diag-
+nostics,
+Sensors
+DNN,
+SVM
+LRP,
+LIME,
+SHAP,
+De-
+cision
+Trees,
+Rule-based
+Explanations,
+Counterfactual
+Explanations
+Helping to interpret engine data and ve-
+hicle status information, predicting main-
+tenance and potential issues,
+improv-
+ing safety, reducing risk, and providing
+clear vehicle health status through insights
+gained from the AI model decision-making
+process
+[193]
+7
+Communica-
+tion
+Data
+(Vehicle-to-
+Everything or
+V2X)
+Personal
+devices,
+Cloud,
+Vehicles,
+Cellular
+networks
+Reinfor-
+cement
+Learning
+LRP,
+Saliency
+Maps,
+Coun-
+terfactual
+Explanations
+Provide insights into model decision-
+making that enhances trust and safety, in-
+teractions with external factors, and im-
+proving decision-making by interpreting
+complex V2X communications
+[194]
+8
+All
+All
+All
+Generative Lan-
+guage
+Model
+Explanation
+Provides textual explanations to model
+users that enable them to interpret di-
+versified datasets and complex AI model
+decision-making process
+[185]
+domains, such as fluid dynamics, quantum mechanics, or ma-
+terial science [206, 207]. Model-agnostic explanations are also
+used to explain the general behavior of physics-aware AI mod-
+els to ensure their decisions are understandable in various sce-
+narios regardless of the specific model architecture [208, 209].
+In the context of physics-aware AI, explainability offers several
+22
+key advantages, such as enhancing trust and interpretability,
+ensuring physically plausible predictions, improving model ar-
+chitecture and debugging, providing domain-specific insights,
+bridging knowledge gaps, ensuring regulatory compliance, and
+facilitating human-AI collaboration [204, 210].
+6. XAI Evaluation Methods
+XAIs are essential in today s advancing AI world to ensure
+trust, transparency, and understanding of AI ethical decision-
+making, particularly in sensitive domains like healthcare, fi-
+nance, military operation, autonomous systems, and legal is-
+sues. However, we need evaluation mechanisms to measure the
+generated explanations to ensure their quality, usefulness, and
+trustworthiness. XAI system evaluation methods are classified
+into human-centered and computer-centered categories based
+on their applications and methodologies to judge the effective-
+ness of XAI techniques [211, 212]. Figure 13 shows a simple
+taxonomy of XAI evaluation methods.
+Figure 13: A suggested classification framework for assessing the efficacy of
+XAI systems (adapted from [211]).
+6.1. Human-Centered Approach
+The human-centered approach evaluates how the provided
+XAI explanations meet model users  needs, understanding lev-
+els, and objectives from the human perspective [213]. This ap-
+proach is concerned with comprehensibility, trust, user satis-
+faction, and decision-making support of the provided XAI ex-
+planations [214]. The generated explanations should be clear,
+brief, and easily understandable by the end-users without tech-
+nical knowledge. The explanation should also be relevant and
+represented by a clear and interpretable visualization mecha-
+nism. The explanations should build the end-users  trust by pro-
+viding a transparent, consistent, and reliable decision-making
+process for the model [215]. Hence, the designed evaluation
+methods ensure the users  trust and satisfaction level through
+surveys, interviews, questionnaires, behavioral analysis, and
+other handy tools. The users  satisfaction is the most essential
+aspect of evaluation methods. The XAI system can be evalu-
+ated by collecting the users  feedback and assessing their emo-
+tional responses [216]. Ease of using the XAI system and the
+usefulness of the generated explanations to end users also pro-
+vide insights into the values of the explanation and XAI system.
+XAI systems can be assessed by evaluating how effectively the
+generated explanations support users  decision-making. How
+much do the XAI explanations apply to their decision-making
+process, reduce errors, and enhance productivity? The human-
+centered evaluation method also assesses the cognitive load that
+ensures the provided XAI explanations do not affect the user s
+cognitive processing capacity [215].
+6.2. Computer-Centered Approach
+The computer-centered method aims to the evaluation of XAI
+techniques based on technical and objective standards without
+the interactions of human interpretation [217]. This method
+involves important XAI technical, objective, and quantifiable
+metrics such as fidelity, consistency, robustness, efficiency, and
+other dimensions [218].
+6.2.1. Fidelity
+Fidelity refers to how the provided XAI explanations are
+close to the actual decision made by a model focusing on the ac-
+curacy of representation, quantitative measurement, and com-
+plex model handling [219]. Does the explanation reflect the
+accurate reasoning decision process of a model? Does the ex-
+planation contain essential information about complex models,
+such as deep learning models? Hence, high fidelity reflects that
+the explanation is an accurate interpretation. Fidelity is com-
+puted at the instance level using the following formula [220]:
+S = 1  
+n
+X
+i=1
+Y(xi)  Y(x 
+i)
+
+|Y(xi)|
+,
+(20)
+where n is total number of inputs, x is the original input for the
+process instance, X  is the set of perturbations for x and x   X ,
+Y(x) is the model output given input x, and Y(x ) is the model
+output given input x .
+6.2.2. Consistency
+Consistency focuses on the stability and coherence of the ex-
+planations provided by the XAI system with the same input and
+different model runs. Stability, uniformity, and predictability
+are the most important aspects of consistency. The consistency
+of XAI systems can be determined in different ways [221]. The
+following equations compute stability and uniformity.
+23
+Stability can be represented by the variance in explanations
+over multiple runs with the same input.
+ 2
+exp = 1
+N
+N
+X
+i=1
+(ei  e)2,
+(21)
+where  2
+exp is variance of explanations, ei is the explanation for
+the ith run,  e is the average of all explanations, and N is the total
+number of runs.
+Uniformity (U) quantifies how uniformly distributed the ex-
+planation features are. The higher value of U implies that the
+distribution of features in the explanation is closer to a uniform
+distribution.
+U = 1  
+v
+u
+t
+1
+N
+N
+X
+N=1
+ 
+rn  1
+N
+!2
+,
+(22)
+where rn is the relevance of nth feature.
+6.2.3. Robustness
+The robustness of the XAI system assesses the resilience of
+explanations in the behavior of model change in various aspects
+such as input change and adversarial attack. The robustness
+also focuses on model update adaptability and generalizabil-
+ity. Is the evaluation method applicable to various XAI systems
+on various platforms? Does the evaluation method continue its
+function if the XAI system is updated? The robustness of XAI
+systems can be computed using the perturbation approach using
+the following formulas [222].
+Resistance to Input Perturbations (R), obtained using the fol-
+lowing equation: the change in explanations with slightly per-
+turbed inputs.
+R = 1  1
+N
+N
+X
+i=1
+ exp(xi)  exp(x 
+i) ,
+(23)
+where exp(x) is the explanation for input x, x 
+i is the perturba-
+tion of xi, and N is the total number of perturbations.
+Adaptability to Model Changes (A): the change in explana-
+tions after the model is updated.
+A = 1
+N
+N
+X
+i=1
+ expm(xi)  expm (xi) ,
+(24)
+where expm(x) is the explanation from model m, expm (x) is
+from the updated model m , and N is the total number of sam-
+ples.
+6.2.4. Efficiency
+The efficiency of the evaluation method involves computa-
+tional capacity and resources, such as resource utilization and
+time, to generate explanations and scalability that the evalua-
+tion method handles large-scale explanations. The following
+simple computing formulas can represent computational speed
+and scalability, respectively [223].
+Computational speed (Cs) is the rate at which an XAI system
+can generate explanations.
+Cs =
+1
+T   R,
+(25)
+where T is the time taken to generate an explanation, and R
+is the computational resources used, such as memory or CPU
+cycles. The lower Cs indicates the higher efficiency.
+Scalability (S ) is the ability of an XAI system to handle in-
+creasing volumes of input data and explanations.
+S = lim
+n 
+P(n)
+n ,
+(26)
+where P is the system s performance measure as the input n size
+grows. The XAI system is scalable and efficient if S is bounded
+as n increases.
+6.2.5. Sufficiency
+The sufficiency metric assesses the adequacy of rationales in
+supporting the model s decision-making process [224]. A ratio-
+nale is a subset of input data that a model identifies as critical
+for its decision-making process. This metric evaluates whether
+the rationales alone are sufficient for the model to maintain its
+prediction confidence. It measures the difference in the model s
+confidence between using the entire input and using just the ra-
+tionale, and it is mathematically represented as:
+sufficiency = m(xi) j  m(ri) j
+(27)
+where m(xi)j is the model s confidence score for the full input
+xi and m(ri) j is the model s confidence score when only the ra-
+tionale ri is provided.
+Measuring the difference in prediction confidence between the
+full input and the rationale helps determine whether the ratio-
+nale alone can sustain the model s decision-making process. A
+small difference indicates high sufficiency, meaning the ratio-
+nale captures most of the essential information. In contrast, a
+large difference suggests low sufficiency, indicating that the ra-
+tionale may be missing important information or that the model
+relies on other parts of the input.
+We can use alternative formulas to compute sufficiency.
+Confidence Ratio (CR): It calculates the ratio of the model s
+confidence with the rationale to the confidence with the full in-
+put.
+CR = m(ri) j
+m(xi) j
+(28)
+A CR close to 1 indicates the rationale is highly sufficient, a
+significantly lower CR (close to 0) suggests it is insufficient,
+and a CR greater than 1 might indicate potential overfitting or
+anomalies in the model s reliance on the rationale.
+Percentage Drop in Confidence (PDC): It measures the per-
+centage decrease in confidence when using the rationale com-
+pared to the full input.
+PDC =
+ 
+1  m(ri) j
+m(xi) j
+!
+  100%
+(29)
+24
+A lower PDC indicates that the rationale is highly sufficient
+with minimal loss of confidence, whereas a higher PDC sug-
+gests that the rationale is insufficient.
+7. Future Research Direction
+The existing XAI systems have faced several challenges in
+various aspects, including design objectives, applications, stan-
+dardization, model complexity, security, and evaluation met-
+rics. Further research is required to overcome these challenges
+and enhance the state-of-the-art. In this section, we discuss
+some of the most common XAI challenges and future research
+directions.
+7.1. Model Complexity
+XAI techniques are often less effective with highly complex
+models [48]. Developing AI models by reducing complexity
+without compromising much on accuracy is a challenging task.
+Model simplification, building hybrid models, and interactive
+explanations may be possible approaches to overcoming the ex-
+isting challenges.
+7.2. Building ML Models with Explanation
+Building AI models with explanations is crucial for safety-
+critical application areas [225]. However, it is not only a tech-
+nical challenge but also involves practical considerations such
+as ethical and legal issues. Building accurate AI models with
+explanations is complex and requires further research. Apply-
+ing XAI in the training stage, using data-driven insights, un-
+derstanding the model s predictions, and continuous interpre-
+tations may be the possible approaches to building AI models
+with explanations [226].
+7.3. Performance vs. Interpretability
+The trade-off between Performance and Interpretability is
+one of the biggest challenges. Simplifying a model for better
+interpretability may lead to reduced accuracy of the model. Per-
+formance is critical for time-sensitive applications and complex
+models, whereas interpretability and explainability are essential
+for safety-critical applications to trust a model. Hence, the rec-
+ommended solution is finding a balance between performance
+and interpretability.
+7.4. Standardization and Evaluation Methods
+The right evaluation metrics are essential to measure the per-
+formance of XAI systems.
+The AI models are designed to
+solve various problems with various design objectives [211],
+and these diversified AI systems require different types of XAI
+systems. Hence, applying the same evaluation metrics to dif-
+ferent XAI systems can be challenging because the design ob-
+jectives of XAI systems are different. For example, the design
+objectives of interpretability, accuracy, fairness, robustness, and
+transparency are different. Each of these XAI design objectives
+may require different evaluation metrics, and it is essential to
+select the right evaluation metrics that align with the design ob-
+jectives of the XAI systems to address this challenge. More-
+over, applying the combinations of different evaluation metrics
+to measure the performance of XAI systems may be helpful.
+7.5. Security and Privacy
+The applications of complex AI systems have exhibited sev-
+eral challenges toward an ethical code, such as security, privacy,
+fairness, bias, accountability, and transparency. For example,
+the diversity of ethical issues is one of the main challenges,
+as current ethical studies have shown. XAI systems help in-
+vestigate and explain how and why the model made such an
+ethical decision. However, XAI systems themselves result in
+privacy, security, and other related challenges and require an-
+other special consideration. XAI explanations may be causes
+of information leakage, model inversion attacks, adversarial at-
+tacks, and explanation integrity. There is a trade-off between
+explainability with security and privacy. Balancing this trade-
+off using some strategies, including privacy-preserving, selec-
+tive explanation, anonymization, secure communication, and
+auditing techniques, is crucial. Integrating differential privacy
+techniques, generating explanations that only highlight broad
+features, producing a generalized explanation, and implement-
+ing access control mechanisms may also be possible to over-
+come the trade-off between performance and interpretability.
+7.6. Explainability of Multi-modal Models
+Multimodal AI models are designed to process multiple data
+modalities, such as texts, images, audio, videos, and other
+modalities.
+Explaining the fusion of modalities, intermodal
+relationships, scalability, data heterogeneity, and high dimen-
+sionality are some of the most complex challenges in the cur-
+rent state-of-the-art [65]. Therefore, designing combined XAI
+techniques may be helpful to address these challenges. The de-
+sign process requires multi-disciplinary efforts from machine
+learning, computer vision, natural language processing, and
+human-computer interaction expertise. Specifically, large lan-
+guage models, GPT, are on the way to becoming Any-to-Any
+Multimodal models [227]. Hence, the Any-to-Any Multimodal
+explanation technique is required, but it is complex and chal-
+lenging.
+7.7. Real-time Explanation
+Complex AI models have recently become more popular
+and deployed in real-time situations in various non-safety and
+safety-critical application areas. Safety-critical application ar-
+eas such as healthcare monitoring, autonomous cars, military
+operations, and robotics models should provide real-time expla-
+nations to ensure safety. However, the existing state-of-the-art
+XAIs have several challenges addressing this real-time explana-
+tion aspect. There are various factors for these XAI challenges.
+For example, a DNN may require numerous layers, thousands,
+millions, or billions of parameters to process the real-time in-
+put data, which is time-consuming, especially for large mod-
+els. On the other hand, large volumes of data are generated
+continuously in real-time situations. For instance, autonomous
+cars have continuous and constant data streams from various
+sources, such as sensors, lidars, and radars with latency con-
+straints. Hence, processing and providing a model explanation
+for this large amount of data and the latency constraint requires
+25
+efficient XAI algorithms and techniques in real-time. Much ef-
+fort is needed to address these challenges and meet the real-
+time requirements of safety-critical applications by consider-
+ing model optimization, parallel processing, efficient XAI al-
+gorithms, hybrid approaches, and other handy techniques.
+7.8. Multilingual and Multicultural Explanation
+In recent years, large AI models that work on the diversity
+of languages and cultures have been employed. However, these
+AI models face several challenges because of the users  expec-
+tations, multilingual and multicultural nature. Hence, suitable
+XAI methods are crucial to providing meaningful model expla-
+nations for cultural variations, regional p

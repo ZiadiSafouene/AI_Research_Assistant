@@ -1,0 +1,321 @@
+Towards falsi able interpretability research
+Matthew L. Leavitt 
+Facebook AI Research
+Menlo Park, California
+ito@fb.com
+Ari S. Morcos 
+Facebook AI Research
+Menlo Park, California
+arimorcos@fb.com
+Abstract
+Methods for understanding the decisions of and mechanisms underlying deep neural net-
+works (DNNs) typically rely on building intuition by emphasizing sensory or semantic
+features of individual examples. For instance, methods aim to visualize the components of
+an input which are  important  to a network s decision, or to measure the semantic properties
+of single neurons. Here, we argue that interpretability research suffers from an over-reliance
+on intuition-based approaches that risk and in some cases have caused illusory progress
+and misleading conclusions. We identify a set of limitations that we argue impede meaning-
+ful progress in interpretability research, and examine two popular classes of interpretability
+methods saliency and single-neuron-based approaches that serve as case studies for how
+overreliance on intuition and lack of falsi ability can undermine interpretability research.
+To address these concerns, we propose a strategy to address these impediments in the form
+of a framework for strongly falsi able interpretability research. We encourage researchers
+to use their intuitions as a starting point to develop and test clear, falsi able hypotheses,
+and hope that our framework yields robust, evidence-based interpretability methods that
+generate meaningful advances in our understanding of DNNs.
+1
+Introduction
+In so far as a scienti c statement speaks about reality, it must be falsi able: and in so
+far as it is not falsi able, it does not speak about reality.
+-Karl Popper
+The Logic of Scienti c Discovery (Popper, 2005)
+The complexity and high-dimensionality of deep neural networks (DNNs) makes them challenging to un-
+derstand. One approach for understanding such systems is to extrapolate from intuitions about simpler,
+lower-dimensional systems. Mapping abstract quantities into concrete sensory forms, such as by visualization,
+can also be a powerful cognitive aid. However, looks are often deceiving and unchecked extrapolation can
+easily lead one astray.
+The Gaussian (normal) distribution provides a vivid example of the pitfalls of extrapolating intuitions about
+low-dimensional systems to higher dimensions. A one-dimensional Gaussian distribution is perhaps the most
+familiar data distribution. Its iconic bell-like silhouette is ubiquitous across textbooks, technical publications,
+and lay reports of polls and statistics. Its one-dimensional shape extrapolates intuitively into two-dimensions:
+similar to an idealized mountain on a relief map. One might then expect that the  shape  of a Gaussian remains
+consistent as its dimensionality increases, with the majority of its mass lying close to the origin, with mass
+falling off like a bell curve as distance from the origin increases. Counterintuitively, however, most of the mass
+of a high-dimensional Gaussian is concentrated in a thin band at a constant distance from the origin. Thus the
+closest analogy for the shape of a high-dimensional Gaussian distribution is that of a soap bubble, or spherical
+shell: a fundamentally different structure than that of low-dimensional Gaussians (Blum et al., 2020; Husz r,
+2017; Vershynin, 2018).
+Intuition is the foundation upon which comprehensive understanding is built. But, as the example of the
+Gaussian distribution shows, unveri ed intuition can be misleading. The basis of one s intuition must be
+veri ed at every iteration of extrapolation. While intuition helps reveal what the important questions are, those
+ Equal contribution
+ Work performed as part of the Facebook AI Residency program
+arXiv:2010.12016v1  [cs.CY]  22 Oct 2020
+questions need to be addressed with strong, falsi able hypotheses. This applies to all science, including deep
+learning.
+The nonlinearity of DNNs renders them resistant to being described and understood using analytical methods,
+leading researchers to rely instead on empirical approaches. A breadth of such approaches have been developed,
+typically referred to using the umbrella terms  interpretability  or  explainability  (Yosinski et al., 2015; Bau
+et al., 2017; Olah et al., 2018; Donnelly and Roegiest, 2019; Radford et al., 2017; Erhan et al., 2009; Zeiler
+and Fergus, 2014; Karpathy et al., 2016; Amjad et al., 2018; Dhamdhere et al., 2019; Olah et al., 2020, 2017;
+Zhou et al., 2015, 2019; Gunning, 2017; Samek et al., 2017; Do ilovi c et al., 2018; Lakkaraju et al., 2017;
+Vellido et al., 2012; Cadamuro et al., 2016; Montavon et al., 2018; Guidotti et al., 2018; Lipton, 2018; Hohman
+et al., 2019; Roscher et al., 2020). Many of these methods rely on building intuition by emphasizing sensory
+or semantic features of individual examples, for instance by visualizing the components of an input which are
+ important  to a network s decision (Springenberg et al., 2015; Selvaraju et al., 2017; Fong and Vedaldi, 2017;
+Baehrens et al., 2010; Simonyan et al., 2014; Zeiler and Fergus, 2014; Shrikumar et al., 2017; Sundararajan
+et al., 2017; Smilkov et al., 2017; Dabkowski and Gal, 2017; Ancona et al., 2018), or characterizing semantic
+properties of individual DNN neurons (Amjad et al., 2018; Meyes et al., 2019; Morcos et al., 2018b; Zhou
+et al., 2015, 2018; Bau et al., 2017; Karpathy et al., 2016; Na et al., 2019; Radford et al., 2017; Rafegas
+et al., 2019). However, these practices make two assumptions that we argue are too frequently unveri ed in
+interpretability research: the assumption that a method faithfully represents meaningful properties of the model
+it is applied to, and the assumption that individual instances or examples faithfully represent the phenomena
+they are being used to illustrate. And their lack of veri cation is symptomatic of a more general lack of
+empirical rigour that impedes interpretability research.
+In this position paper we discuss a set of impediments to robust interpretability research: a lack of concrete,
+falsi able hypotheses; the abundance and seductive allure of visualization; under-veri cation of the principles
+upon which interpretability methods are based; a lack of quanti able approaches; and a lack user research for
+human veri cation (Section 2). We next review two case studies in the literature which exemplify the pitfalls
+of pursuing un(der)veri ed intuitions in deep learning, and perform a "post-mortem" to identify and explain
+the impediments that led to misleading conclusions (Sections 3 and 4). We then articulate a strategy to address
+these impediments in the form of a framework for robust, falsi able interpretability research (Section 5). And
+we  nish by applying our framework to strengthen an example hypothesis (Section 6).
+The motivation for this paper is not unprecedented; pleas have previously been made for greater rigor in the
+conduct and communication of machine learning research more broadly (Lipton and Steinhardt, 2018; Forde
+and Paganini, 2019), and in interpretability in particular (Doshi-Velez and Kim, 2017; Lipton, 2018). Both
+Lipton (2018) and Doshi-Velez and Kim (2017), motivated by a lack of consensus and rigor regarding the
+de nition, aims, and practices of interpretability research, sought to clarify these factors. In the intervening
+time since these publications, the technical shortcomings of the approaches in our case studies have precipitated,
+and many of them have been amended or alternative approaches have been developed. We think it s important
+not just to amend theses technical shortcomings, but also to analyze them so that we can generalize across
+cases to identify the impediments that allowed these technical shortcomings to arise in the  rst place, and
+determine how we can conduct interpretability research in a manner that avoids these impediments. As
+such, the recommendations in this paper focus more speci cally on interpretability practices and less on the
+de nitions and aims that were key parts of Lipton (2018) and Doshi-Velez and Kim (2017). Our core aim
+is to articulate concrete ways of "doing good science" in the context of interpretability research, by way of
+referencing both exemplary techniques and cautionary tales.
+We emphasize that we are not arguing that intuition should be dispensed with altogether; intuition is essential
+for building understanding, and all else being equal, an intuitive method is strictly preferable to an unintuitive
+method. We are instead arguing that unveri ed intuition and other aspects of interpretability research can
+facilitate misapprehension. Accordingly, the goal of this paper is to prevent misdirected effort, better realize
+the potential of useful approaches, and facilitate more impactful research through the application of scienti c
+rigor.
+2
+Impediments to falsi able interpretability research
+Here, we discuss a set of impediments to interpretability research whose resolution would improve the
+robustness and reliability of our methods and the knowledge they generate. The primary impediment is an
+underemphasis on clear, speci c, testable, and most critically, falsi able hypotheses. This includes a lack of
+concrete null and alternative outcomes in the formulation of interpretability-guided hypotheses. We note that
+2
+an interpretability method itself doesn t need to be used to test a hypothesis directly; it can provide an intuition
+that forms the basis of a hypothesis that is testable with other methods.
+Not only are interpretability methods underutilized for hypothesis formulation, but the methods themselves
+are too often left insuf ciently scrutinized. Speci cally, they re not veri ed as being important for DNN
+function for example the assumption that some property of a single neuron is consequential to the behavior
+of the network. We believe that this issue is exacerbated by the innate visual appeal of many methods, which
+can provide a potentially false sense of comprehension, serving as an accelerant for unveri ed approaches.
+The abundance and seductive allure of visualization can be another impediment to robust interpretability
+research. Finding compelling, intuitive ways of representing information is critical for building understanding
+(Tufte and Graves-Morris, 1983; Victor, 2014), and many interpretability methods produce rich, stimulating
+visualizations (Mordvintsev et al., 2015a,b; Gatys et al., 2016; Olah et al., 2018, 2017, 2020; Gatys et al., 2015;
+Zeiler and Fergus, 2014). But the illustrative power of visualization is a double-edged sword: an evocative
+graphic can elicit a strong feeling of comprehension regardless of whether the graphic faithfully represents the
+phenomenon it is attempting to depict. This makes interpretability a domain in which it is particularly easy to
+fall prey to unveri ed intuitions, and emphasizes the importance of faithful visualization.
+Lack of quanti cation also impedes interpretability research. While not all methods can be quanti ed, it s hard
+to move beyond intuition without quanti cation. Quanti cation relates directly to the issue of veri cation,
+because quanti cation is often essential for veri cation. Anecdotal inspection of visualizations is not a
+method that scales to the number of scenarios that need to be evaluated to robustly verify a phenomenon.
+The number of models, data samples, hyperparameter con gurations, and so on the very factors that make
+deep learning effective make this untenable. Furthermore, visual inspection presents risks. It can lead to
+cherry picking intentionally or unintentionally samples or instances that over-emphasize certain features
+or properties. It can also serve as a Rorschach test for a researcher, reinforcing their biases and adding
+unnecessary researcher degrees of freedom (Simmons et al., 2011).3
+The  nal impediment regards the importance of user research for human veri cation. Despite some inter-
+pretability methods being designed with the stated intent to provide actionable explanations to humans, many
+studies neglect to conduct controlled experiments using human subjects to evaluate the quality and utility of
+these methods.
+3
+Case study: The misdirection of saliency
+ Saliency  methods (also known as feature attribution methods) refer to a collection of approaches that attempt
+to provide the user with insight as to  why  a DNN made a speci c decision (i.e. performed an instance of
+inference) by identifying the features or parts of the input that are most relevant (or  salient ) to the model s
+output, typically by using some version of the gradient of the output with regard to the input (Springenberg
+et al., 2015; Selvaraju et al., 2017; Fong and Vedaldi, 2017; Baehrens et al., 2010; Simonyan et al., 2014;
+Zeiler and Fergus, 2014; Shrikumar et al., 2017; Sundararajan et al., 2017; Smilkov et al., 2017; Dabkowski
+and Gal, 2017; Ancona et al., 2018; Adebayo et al., 2018). Saliency methods generate rich, visually-appealing
+annotations or transformations of input samples. For example, a saliency method applied to a network trained
+for object recognition might generate a heatmap across an example image of a cat that highlights the cat s ears,
+leading to the conclusion that ears are the most salient aspect of the image for the network s determination of
+ catness . Such a rich yet straightforward visualization strongly appeals to intuition. Indeed, the widespread
+study and application of saliency methods speaks to their intuitive appeal (Springenberg et al., 2015; Selvaraju
+et al., 2017; Fong and Vedaldi, 2017; Baehrens et al., 2010; Simonyan et al., 2014; Zeiler and Fergus, 2014;
+Shrikumar et al., 2017; Sundararajan et al., 2017; Smilkov et al., 2017; Dabkowski and Gal, 2017; Ancona
+et al., 2018; Yamashita et al., 2018; Rajpurkar et al., 2017; Wang et al., 2017, 2020; Puri et al., 2019; Mott
+et al., 2019; Wang et al., 2016b; Iyer et al., 2018; Greydanus et al., 2018; Nikulin et al., 2019).
+But recent studies have cast doubt on their reliability (Alqaraawi et al., 2020; Kindermans et al., 2017;
+Sundararajan et al., 2017; Binder et al., 2016; Shrikumar et al., 2017; Chandrasekaran et al., 2017; Adebayo
+et al., 2018; Wang et al., 2019; Atrey et al., 2019). Sundararajan et al. (2017); Binder et al. (2016); Shrikumar
+et al. (2017) identi ed that many studies of saliency methods lack a clear baseline for comparison (i.e. null
+3Researcher degrees of freedom are described by Simmons et al. (2011) as follows:  In the course of collecting and
+analyzing data, researchers have many decisions to make: Should more data be collected? Should some observations
+be excluded? Which conditions should be combined and which ones compared? Which control variables should be
+considered? Should speci c measures be combined or transformed or both?  All of these factors can encourage misleading
+conclusions.
+3
+hypothesis), a necessary condition for robust interpretability research. The notice of its absence presaged
+larger issues with saliency methods.
+For saliency methods to be useful, they need to re ect meaningful properties of both the data and the networks
+to which they re applied. For example, if an input and a baseline (i.e. control image) differ in one feature
+and the network has different predictions for the input and baseline, then the different feature should be
+identi ed as salient; likewise if a DNN does not depend on some feature, that feature should have zero salience.
+Sundararajan et al. (2017) identi ed that many saliency methods fail to exhibit this pair of traits, which they
+term  sensitivity . The lack of sensitivity indicates that some saliency methods are prone to false negative and
+false positive assessments of the relevance of input features.
+Saliency methods also need to re ect invariances of the networks to which they re applied. Take the example
+of networks with different architectures or parameters but identical output behavior across a dataset, which
+we term to be functionally equivalent. If two networks are functionally equivalent in this manner, a saliency
+method should generate identical results for the two networks. Sundararajan et al. (2017) refer to this as
+implementation invariance, and showed that many saliency methods do not exhibit this property. This concept
+can also be extended to the input data: saliency methods should be invariant to input transformations that do
+not affect model predictions or weights, a property that (Kindermans et al., 2017) found is not obeyed by many
+saliency methods. These results indicate that many saliency methods do not re ect meaningful properties of
+the systems they are used to understand.
+Perhaps most importantly, saliency methods are intended to help understand DNNs. Accordingly, they are
+only useful for this purpose if they provide information about the data with regards to the model, not just the
+data in isolation. Adebayo et al. (2018) examined a suite of saliency methods and found that many of them
+produced nearly identical saliency maps even when all the model s parameters were reinitialized or the models
+were trained on label-shuf ed data. They also used an edge detector as an additional control, because edge
+detectors are not speci c to either models or training data, and found that the outputs of the saliency methods
+were in many cases very similar to those of the edge detector. Because gradient-based methods naturally
+emphasize edges, and because edges are inherently salient to humans (Henderson, 2003; Geisler, 2008; Bansal
+et al., 2013), this means that saliency methods will likely generate maps which appear consistent with human
+experience, regardless of whether they re ect meaningful properties of the model, undermining their primary
+purpose of providing insight about a model s decision. Put another way, these methods provided the answer
+we wanted to hear regardless of whether or not it was true.
+Saliency methods are intended to provide humans with an understanding of  why  a DNN made a decision.
+Accordingly, providing humans with the results of saliency methods should improve their ability to reason
+about and/or predict the behavior of DNNs. Chandrasekaran et al. (2017) used a Visual Question Answering
+(VQA) task and found that providing humans with saliency maps for the image and/or words in a data sample
+do not improve subjects  predictions of the DNN s behavior. A subsequent study (Alqaraawi et al., 2020)
+found that saliency maps only weakly improve participants  abilities to anticipate a network s output for new
+images. These studies call into question the ef cacy of saliency for achieving its stated goal and highlight the
+necessity of verifying the human side of interpretability methods. It is possible that saliency methods lack
+utility for aiding human predictions because they generate outputs that appear meaningful to humans but are
+unrelated to the models, indicating that rigorous methodological controls and human veri cation are two sides
+of the same coin.
+It is unfortunate that many saliency methods have not held up to scrutiny, especially given their application to
+extremely sensitive settings such as medical imaging (Seo, 2019; Amit et al., 2017; Wang et al., 2017, 2018;
+Zhang et al., 2017; Mahapatra et al., 2016; Rajpurkar et al., 2017; Yamashita et al., 2018; Karargyris et al.,
+2019), which present a signi cant safety risk if deployed uncritically. Thankfully, there has been meaningful
+progress in assessing and developing robust saliency methods. Kindermans et al. (2017); Adebayo et al. (2018);
+Arras et al. (2019); Yeh et al. (2019); Hooker et al. (2019); Sanchez-Lengeling et al. (2020) in particular
+provide guidance for verifying interpretability methods4 and/or develop robust methods, and the work of
+Chandrasekaran et al. (2017); Doshi-Velez and Kim (2017); Alqaraawi et al. (2020) provide examples of how
+to evaluate human-relevance.
+4It bears mentioning that some studies identifying limitations in saliency methods used their discoveries to design
+newer, more robust saliency methods, which were then in turn shown to have signi cant limitations. In our view, this
+demonstrates the critical roles of iteration and replication in scienti c research.
+4
+4
+Case study: Single units and (sub)optimal examples
+While saliency seeks to explain how a model made a decision with regard to a single input, our next case
+study examines a group of interpretability methods that aim to build intuitions for the broader mechanisms by
+which DNNs function (Zhou et al., 2015; Rafegas et al., 2019; Erhan et al., 2009; Zeiler and Fergus, 2014;
+Simonyan et al., 2014; Yosinski et al., 2015; Nguyen et al., 2016a; Olah et al., 2017, 2018; Amjad et al.,
+2018; Meyes et al., 2019; Morcos et al., 2018b; Zhou et al., 2015, 2018; Bau et al., 2017; Karpathy et al.,
+2016; Na et al., 2019; Radford et al., 2017; Rafegas et al., 2019; Olah et al., 2020; Nguyen et al., 2016b;
+Dosovitskiy and Brox, 2016; Mahendran and Vedaldi, 2014). DNNs are extremely high-dimensional systems,
+and as the opening example with the Gaussian distribution demonstrated, it is challenging to mentally navigate
+high-dimensional spaces. This challenge is a strong motivator for humans to abandon high-dimensional
+thinking in favor of the familiarity and comfort of low-dimensional signals. This can in turn encourage
+the properties of individual units to be deployed as an explanation of  what  a network is  doing , which
+assumes the unit is both representative of other units and responsible for some delineated sub-component
+of the network s behavior. Many of these methods make claims based solely on visualization or qualitative
+properties (Zhou et al., 2015; Rafegas et al., 2019; Erhan et al., 2009; Zeiler and Fergus, 2014; Simonyan
+et al., 2014; Yosinski et al., 2015; Nguyen et al., 2016a; Olah et al., 2017, 2018, 2020; Nguyen et al., 2016b;
+Dosovitskiy and Brox, 2016; Mahendran and Vedaldi, 2014; Hohman et al., 2019). We start by examining how
+our falsi ability framework applies to visualizations.
+Visualization is a common method for building intuition about the properties of single units. In the most basic
+approach, one simply identi es the input sample(s) (e.g. images) or sample subregions that maximally activate
+a given neuron (Zhou et al., 2015; Rafegas et al., 2019). Another approach uses optimization to generate
+samples that maximize unit activations (Erhan et al., 2009; Zeiler and Fergus, 2014; Simonyan et al., 2014;
+Yosinski et al., 2015; Nguyen et al., 2016a; Olah et al., 2017, 2018, 2020; Nguyen et al., 2016b; Dosovitskiy
+and Brox, 2016; Mahendran and Vedaldi, 2014). While these methods may be useful for building intuition,
+they can also encourage three potentially misleading assumptions: that the visualization is representative of the
+neuron s behavior; that the neuron is responsible for a clearly delineated portion of the task or the network s
+behavior; and that the neuron s behavior is representative of the network s behavior.
+To illustrate how visualization can provide misleading intuitions about a neuron s properties, we summarize
+Husz r (2017) s lucid example: If a neuron responds to images of Gaussian noise, a method that generates
+the  optimal  input for that neuron may end up generating a gray square, which is very different from the
+samples it most strongly responds to: white noise images which look like static. (Olah et al., 2017; Nguyen
+et al., 2016b) are also motivated by the potential of single instances to generate misleading conclusions.
+In addition to visualization methods potentially being misleading, they are often under-utilized for informing
+and evaluating strong, falsi able hypotheses. While demonstrating that an optimal sample exists or that an
+optimal sample exhibits certain qualities are technically falsi able hypotheses, these are not strong hypotheses.
+Stronger hypotheses would relate to network function instead of just proof of existence. It seems that
+visualization methods have a dual de cit when it comes to testing: their  representativeness  is not always
+tested, nor are they used to guide or test hypotheses.
+Non-visualization-based methods for characterizing the behavior of individual neurons typically by charac-
+terizing the distribution of the neuron s activity over data classes or values of a data feature are myriad and
+ubiquitous (Amjad et al., 2018; Meyes et al., 2019; Morcos et al., 2018b; Zhou et al., 2015, 2018; Bau et al.,
+2017; Karpathy et al., 2016; Na et al., 2019; Radford et al., 2017; Rafegas et al., 2019). Because the practice is
+imported from neuroscience (Sherrington, 1906; Adrian, 1926; Granit, 1955; Hubel and Wiesel, 1959; Barlow,
+1972; Kandel et al., 2000), we will abide by their lexicon and collectively refer to these practices as measuring
+ selectivity . Selectivity-based methods have a similar allure as visualization, but the appeal is semantic
+instead of sensory. One notable study identi ed a neuron selective for sentiment in an LSTM network trained
+on a word prediction task (Radford et al., 2017). Another found individual neurons selective for cats faces
+and human bodies (Radford et al., 2017). (Olah et al., 2017, 2018, 2020) propose single unit selectivity as a
+building block for understanding DNNs. The in uence of these studies demonstrates the widespread appeal
+of selectivity (Amjad et al., 2018; Meyes et al., 2019; Morcos et al., 2018b; Zhou et al., 2015, 2018; Bau
+et al., 2017; Karpathy et al., 2016; Na et al., 2019; Radford et al., 2017; Rafegas et al., 2019; Olah et al., 2017,
+2018, 2020). But neither semantic abstraction nor quanti cation completely avoid the pitfalls of visualization,
+because they can still encourage the assumptions that a neuron is responsible for a clearly delineated portion
+of the task or the network s function, or is representative of a network s behavior.
+5
+A number of recent studies examining class selectivity a form of selectivity de ned as how variable a
+neuron s responses are across different classes of data samples have demonstrated that the properties of
+single neurons may not robustly account for the behavior of networks Morcos et al. (2018b) used single unit
+ablation and other techniques to demonstrate that a network s test set generalization is negatively correlated
+(or uncorrelated) with the class selectivity of its units, suggesting that highly-selective units are no more
+important (or perhaps even less important) than confusing, non-selective units. Amjad et al. (2018) con rmed
+these results for single unit ablation, but also performed cumulative ablation analyses where multiple units
+are ablated, the results of which suggested that selectivity is mildly bene cial. This dichotomy presents one
+example of how it can be dif cult to extrapolate from single neurons to networks, in this case because of
+redundancy across units.
+Similar results have been shown for models trained on NLP tasks. Dalvi et al. (2019) found that ablating units
+selective for linguistic features causes greater performance de cits than ablating less-selective units. Donnelly
+and Roegiest (2019) found that ablating Radford et al. (2017) s  sentiment neuron  has minimal impact on
+the network s ability to detect and label sentiment. These results certainly cast doubt on the assumptions
+that individual neurons contribute to clearly delineated portions of the network s behavior and that individual
+neurons are representative of the network, but they are also limited by their reliance on the method of single
+unit ablation.
+As detailed in Leavitt and Morcos (2020a), single unit ablation in trained networks can only address the
+effects of inactivating a neuron in a network whose training process assumed that the neuron was present. This
+presents two key limitations to investigating the causal role of selectivity: single unit ablation is unable to
+address whether the presence of selectivity is bene cial (i.e. is it suf cient), and it is unable to address whether
+networks need to learn selectivity to function properly. With these limitations in mind, Leavitt and Morcos
+(2020a) conducted a study in which they regularized against class selectivity in the loss function sidestepping
+the shortcomings of single unit ablation to examine the causal role of class selectivity in network function.
+They found that class selectivity is largely unnecessary for network function, and reducing it can even improve
+network performance. They also found in a follow-up study that reducing class selectivity increases robustness
+to naturalistic corruptions of input data (Leavitt and Morcos, 2020b). These results demonstrate that networks
+do not need to learn class selectivity, and that in some cases learning class selectivity can impair network
+function, indicating that examining class selectivity in single neurons may be a red herring with regards to
+understanding network function.
+The studies we detailed support the notion that the tractable, semantic allure of single neurons  low-dimensional
+representations can encourage an overreliance on intuition. And while these studies question the functional
+relevance of class selectivity, we view them more broadly as a bulwark against the intuitive appeal of focusing
+on single neuron properties. This suggests that researchers should focus on properties that exist across
+neurons distributed, high-dimensional representations and highlights the need to develop tools to make
+these properties more tractable and accessible to intuition. Agrawal et al. (2014); Wang et al. (2016a); Alain
+and Bengio (2018); Morcos et al. (2018a); Fong and Vedaldi (2018) are examples of studies that attempt to
+better understand DNNs by examining distributed representations.
+5
+Best practices for robust, falsi able interpretability research
+We have attempted to illustrate how the seductive appeal of intuition and a lack of veri cation and falsi ability
+have resulted in misleading conclusions and illusory progress in two domains of interpretability research:
+saliency and single neuron-based approaches. What follows is a high-level framework for best practices to
+help ensure robust, falsi able interpretability research. These practices are guided by the impediments to
+interpretability research presented in Section 2, and by the techniques and interventions that revealed the
+limitations of saliency and single unit-based approaches. We provide practical examples and

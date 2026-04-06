@@ -1,0 +1,1220 @@
+Interpreting CNNs via Decision Trees
+Quanshi Zhang , Yu Yang , Haotian Ma , and Ying Nian Wu 
+ Shanghai Jiao Tong University,
+ University of California, Los Angeles,
+ South China University of Technology
+Abstract
+This paper1 aims to quantitatively explain rationales of
+each prediction that is made by a pre-trained convolutional
+neural network (CNN). We propose to learn a decision tree,
+which clari es the speci c reason for each prediction made
+by the CNN at the semantic level. I.e. the decision tree
+decomposes feature representations in high conv-layers of
+the CNN into elementary concepts of object parts. In this
+way, the decision tree tells people which object parts acti-
+vate which  lters for the prediction and how much they con-
+tribute to the prediction score. Such semantic and quantita-
+tive explanations for CNN predictions have speci c values
+beyond the traditional pixel-level analysis of CNNs. More
+speci cally, our method mines all potential decision modes
+of the CNN, where each mode represents a common case of
+how the CNN uses object parts for prediction. The decision
+tree organizes all potential decision modes in a coarse-to-
+ ne manner to explain CNN predictions at different  ne-
+grained levels. Experiments have demonstrated the effec-
+tiveness of the proposed method.
+1. Introduction
+Convolutional neural networks (CNNs) [20, 18, 14] have
+achieved superior performance in various tasks. However,
+besides the discrimination power, model interpretability is
+still a signi cant challenge for neural networks. Many stud-
+ies have been proposed to visualize or analyze feature rep-
+resentations hidden inside a CNN, in order to open the black
+box of neural networks.
+Motivation & objective: In the scope of network inter-
+pretability, state-of-the-art algorithms are still far from the
+ultimate goal of explaining why a CNN learns knowledge as
+it is. Although some theories, such as the information bot-
+tleneck [34], analyzed statistical characteristics of a neural
+1Quanshi Zhang is the corresponding author with the John Hopcroft
+Center and the MoE Key Lab of Arti cial Intelligence, AI Institute, at the
+Shanghai Jiao Tong University, China. Yu Yang and Ying Nian Wu are
+with the University of California, Los Angeles, USA. Haotian Ma is with
+the South China University of Technology, China.
+Tail
+...
+Explanatory 
+tree
+y=0.87
+(b) grad-CAM
+(a) Input
+(c) Visualization of filters
+(d) Our explanations
+Conv5-2
+Conv3-3
+Figure 1. Different types of explanations for CNNs. We compare
+(d) our task of quantitatively and semantically explaining CNN
+predictions with previous studies of interpreting CNNs, such as
+(b) the grad-CAM [26] and (c) CNN visualization [23]. Given an
+input image (a), we infer a parse tree (green lines) within the deci-
+sion tree to project neural activations onto clear concepts of object
+parts. Our method quantitatively explains which  lters/parts (in
+the small/big round) are used for the prediction and how much
+they contribute to the prediction. We visualize numerical contri-
+butions from randomly selected 10%  lters for clarity.
+network, it is still a challenge to explain why a CNN en-
+codes frontal-leg features, rather than rear-leg features, for
+classi cation during the end-to-end learning process.
+Therefore, in this study, we limit our discussion to the
+issue of explaining what knowledge a CNN learns. In this
+direction, our research focuses on the following two new
+perspectives of interpreting CNNs:
+  How to explain features of a middle layer in a CNN
+at the semantic level.
+I.e.
+we aim to transform
+chaotic features of  lters inside a CNN into seman-
+tically meaningful concepts, such as object parts, so
+as to help people to understand the knowledge in the
+CNN.
+  How to quantitatively analyze the rationale of each
+CNN prediction.
+We need to  gure out which  l-
+ters/parts pass their appearance information through
+the CNN and contribute to the prediction output. We
+1
+arXiv:1802.00121v2  [cs.CV]  25 Feb 2019
+...
+Most 
+generic 
+rationales
+(our target)
+Most 
+specific 
+rationales
+Mode of long-neck birds
+Mode of standing birds
+Disentangled 
+filters in the top 
+conv-layer
+y=0.9
+...
+FC 
+layers
+A head filter
+A feet filter
+A torso filter
+contribute 2.32%
+contribute 0.72%
+contribute 1.21%
+Figure 2. Decision tree that encodes all potential decision modes
+of the CNN in a coarse-to- ne manner. We learn a CNN for object
+classi cation with disentangled representations in the top conv-
+layer, where each  lter represents an object part. Given an input
+image, we infer a parse tree (green lines) from the decision tree
+to semantically and quantitatively explain which object parts (or
+ lters) are used for the prediction and how much an object part
+(or  lter) contributes to the prediction. We are more interested in
+high-layer decision modes that summarize low-layer modes into
+compact explanations of CNN predictions.
+also report the numerical contribution of each  lter (or
+object part) to the output score.
+As shown in Fig. 1, above two perspectives are crucial in
+real applications and have essential differences from tradi-
+tional pixel-level visualization and diagnosis of CNN fea-
+tures [37, 23, 10, 24, 22]. Our semantic and quantitative
+explanations for CNNs have potential values beyond pixel-
+level visualization/analysis of CNNs. Semantic and quan-
+titative explanations can help people better understand and
+trust CNN predictions. E.g. in critical applications, such as
+the recommendation for a surgery plan, people are usually
+not simply satis ed by the plan itself, but expect a quantita-
+tive explanation for the plan.
+However, bridging the gap between a CNN s middle-
+layer features and semantic explanations has not been well
+explored yet. We will introduce our task, clarify its chal-
+lenges, and de ne relevant concepts from the following two
+perspectives.
+1. Bridging middle-layer features with semantic con-
+cepts:
+Given an input image, the  rst issue is to
+learn more interpretable feature representations inside
+a CNN and associate each neural activation inside a
+CNN with a semantic concept. This presents signi -
+cant challenges for state-of-the-art algorithms.
+Firstly, we need to force feature representations in middle
+conv-layers to be well disentangled during the learning pro-
+cess. According to [2, 38]2, a  lter in traditional CNNs usu-
+2Zhang et al. [40] summarized the six types of semantics de ned in [2]
+as parts and textures.
+ally represents a mixture of parts and textures. Learning
+semantically meaningful  lters is dif cult but is the foun-
+dation of semantic-level explanations. In this research, we
+learn a CNN with disentangled  lters in high conv-layers.
+Each  lter needs to be consistently activated by the same
+object region over different input images. We do not use
+any annotations of parts or textures to supervise the disen-
+tanglement of  lter features.
+Secondly, we also need to associate each disentangled
+ lter with an explicit semantic meaning (i.e.
+an object
+part in this study). This enables linguistic descriptions of
+middle-layer knowledge, for example, how many parts are
+memorized in the CNN and how the parts are organized.
+2. Bridging middle-layer features with  nal CNN predic-
+tions: When we have assigned middle-layer features
+with speci c part concepts, the next issue is to quanti-
+tatively explain how the CNN uses these middle-layer
+features to compute prediction scores. In other words,
+given an input image, we hope to clarify the speci c
+rationale of the CNN prediction.
+Here, we de ne the rationale of a CNN prediction as the set
+of object parts (or  lters) that are activated and contribute to
+the prediction. Given different input images, the CNN uses
+different object parts to activate different sets of  lters to
+compute prediction scores, thereby having different ratio-
+nales. Let us take the bird classi cation as an example. The
+CNN may use several  lters activated by the head appear-
+ances as rationales to classify a standing bird, and the CNN
+may take  lters for wings to distinguish a  ying bird.
+Given each input image, our task is to clarify  lters of
+which object parts are activated and to quantitatively mea-
+sure the contribution of each object part to the prediction.
+The concept of the contribution was also called the  impor-
+tance  in [24, 22] and was termed  attribution  in [16]. As
+shown in Fig. 2, we describe the contribution as  a head  l-
+ter contributes 2.32%, and a feet  lter contributes 0.72%. 
+Task: As shown in Fig. 1, given a pre-trained CNN, we
+propose a method to construct a decision tree to explain
+CNN predictions semantically and quantitatively. We sum-
+marize rationales of CNN predictions on all images into var-
+ious decision modes. Each tree node represents a decision
+mode. Each decision mode describes common rationales
+of predictions that are shared by multiple images. I.e. for
+these images, the CNN usually activates similar  lters (ob-
+ject parts), and each part makes a similar contribution to the
+prediction.
+The decision tree hierarchically represents all potential
+decision modes of a CNN in a coarse-to- ne manner. Nodes
+near to the tree root node mainly represent most common
+decision modes (prediction rationales) shared by many im-
+ages. Nodes near leaves correspond to  ne-grained modes
+of minority images. In particular, each leaf node encodes
+the speci c decision mode of a certain image.
+In order to build the decision tree, we learn  lters to rep-
+resent object parts (we do not label any parts or textures as
+additional supervision3). Then, we assign each  lter with
+a certain part name. Finally, we mine decision modes to
+explain how the CNN use parts/ lters for prediction, and
+construct a decision tree.
+Inference: When the CNN makes a prediction for an
+input image, the decision tree determines a parse tree (see
+green lines in Fig. 2) to encode a series of explanations.
+Each node (decision mode) in the parse tree quantitatively
+explains the prediction at a certain abstraction level, i.e.
+clarifying how much each object part/ lter contributes to
+the prediction score.
+Compared to  ne-grained modes in leave nodes, we are
+more interested in generic decision modes in high-level
+nodes. Generic decision modes usually select signi cant
+object parts ( lters) as the rationale of CNN predictions and
+ignore insigni cant ones. Thus, generic decision modes re-
+ ect compact rationales for CNN predictions.
+Contributions: In this paper, we aim to bridge CNN
+representations with semantic visual concepts, in order to
+explain CNN predictions quantitatively and semantically.
+We propose to learn the decision tree without strong super-
+vision for explanations. Our method is a generic approach
+and has been successfully applied to various benchmark
+CNNs. Experiments have demonstrated the effectiveness
+of our method.
+2. Related work
+In this section, we limit our discussion to the litera-
+ture of opening the black box of CNN representations.
+[2, 21, 9, 4] discussed the de nition of interpretability from
+different perspectives with respect to different tasks. Zhang
+et al. [43] made a survey for the interpretability of deep vi-
+sual models.
+CNN visualization:
+Visualization of  lters in a CNN is
+the most direct way of exploring the pattern hidden inside a
+neural unit. Gradient-based visualization [37, 23] estimates
+the input image that maximizes the activation score of a
+neural unit. Up-convolutional nets [10] invert feature maps
+of conv-layers into images. Unlike gradient-based methods,
+up-convolutional nets cannot mathematically ensure that the
+visualization result re ects actual neural representations.
+Zhou et al. [44] proposed a method to accurately com-
+pute the image-resolution receptive  eld of neural activa-
+tions in a feature map. The estimated receptive  eld of a
+neural activation is smaller than the theoretical receptive
+ eld based on the  lter size. The accurate estimation of the
+3Part annotations are not used to learn the CNN and the decision tree.
+Given the learned CNN, we label object parts for the  lters to compute
+part-level contributions in Equation (11).
+receptive  eld is crucial to understand a  lter s representa-
+tions. Bau et al. [2] further de ned six types of semantics
+for CNNs, i.e. objects, parts, scenes, textures, materials,
+and colors. Zhang et al. [38] summarized the six types of
+semantics into  parts  and  textures.  Nevertheless, each
+ lter in a CNN represents a mixture of semantics. [45] ex-
+plained semantic reasons for visual recognition.
+Network diagnosis:
+Going beyond visualization, some
+methods diagnose a pre-trained CNN to obtain insight un-
+derstanding of CNN representations.
+Fong and Vedaldi [11] analyzed how multiple  lters
+jointly represented a certain semantic concept. Yosinski et
+al. [36] evaluated the transferability of  lters in intermedi-
+ate conv-layers. Aubry et al. [1] computed feature distri-
+butions of different categories in the CNN feature space.
+Selvaraju et al. [26] and Fong et al. [12] propagated gradi-
+ents of feature maps w.r.t. the CNN loss back to the image,
+in order to estimate image regions that directly contribute
+the network output. The LIME [24] and SHAP [22] ex-
+tracted image regions that were used by a CNN to predict
+a label. Zhang et al. [41] used an explainer network to in-
+terpret object-part representations in intermediate layers of
+CNNs.
+Network-attack methods [17, 30] diagnosed network
+representations by computing adversarial samples for a
+CNN. In particular, in uence functions [17] were proposed
+to compute adversarial samples, provide plausible ways to
+create training samples to attack the learning of CNNs,
+ x the training set, and further debug representations of
+a CNN. Lakkaraju et al. [19] discovered knowledge blind
+spots (unknown patterns) of a pre-trained CNN in a weakly-
+supervised manner. The study of [39] examined represen-
+tations of conv-layers and automatically discover potential,
+biased representations of a CNN due to the dataset bias.
+CNN semanticization:
+Compared to the diagnosis of
+CNN representations, some studies aim to learn more mean-
+ingful CNN representations. Some studies extracted neu-
+ral units with certain semantics from CNNs for different
+applications. Given feature maps of conv-layers, Zhou et
+al. [44] extracted scene semantics. Simon et al. mined ob-
+jects from feature maps of conv-layers [27], and learned ob-
+ject parts [28]. The capsule net [25] used a dynamic routing
+mechanism to parse the entire object into a parsing tree of
+capsules. Each output dimension of a capsule in the net-
+work may encode a speci c meaning. Zhang et al. [40] pro-
+posed to learn CNNs with disentangled intermediate-layer
+representations. The infoGAN [6] and  -VAE [15] learned
+interpretable input codes for generative models. Zhang et
+al. [42] learned functionally interpretable, modular struc-
+tures for neural networks via network transplanting.
+Decision trees for neural networks:
+Distilling knowl-
+edge from neural networks into tree structures is an emerg-
+ing direction [13, 31, 5], but the trees did not explain the net-
+Filter 1
+Filter 2
+Filter 3
+Ordinary filters
+Disentangled filters
+Figure 3. Comparisons between ordinary CNN feature maps and
+disentangled feature maps that are used in this study. We visualize
+image regions corresponding to each feature map based on [44].
+work knowledge at a human-interpretable semantic level.
+Wu et al. [35] learned a decision tree via knowledge dis-
+tillation to represent the output feature space of an RNN,
+in order to regularize the RNN for better representations.
+Vaughan et al. [32] distilled knowledge into an additive
+model for explanation.
+In spite of the use of tree structures, there are two main
+differences between the above two studies and our research.
+Firstly, we focus on using a tree to semantically explain
+each prediction made by a pre-trained CNN. In contrast, de-
+cision trees in above studies are mainly learned for classi -
+cation and cannot provide semantic-level explanations. Sec-
+ondly, we summarize decision modes from gradients w.r.t.
+neural activations of object parts as rationales to explain
+CNN prediction. Compared to above  distillation-based 
+methods, our  gradient-based  decision tree re ects CNN
+predictions more directly and strictly.
+3. Image-speci c rationale of a CNN prediction
+In this section, we design a method to simplify the com-
+plex feature processing inside a CNN into a linear form
+(i.e. Equation (3)), as the speci c rationale of the predic-
+tion w.r.t. the input image. This clari es (i) which object
+parts activate which  lters in the CNN and (ii) how much
+these parts/ lters contribute to the  nal prediction score.
+In order to obtain semantic-level rationale of a CNN pre-
+diction, we need (i)  rst to ensure that the CNN s middle-
+layer features are semantically meaningful, and (ii) then to
+extract explicit contributions of middle-layer features to the
+prediction score.
+In this study, we learn the CNN for object classi cation.
+Theoretically, we can interpret CNNs oriented to different
+tasks. Nevertheless, in this paper, we limit our attention to
+CNNs for classi cation, in order to simplify the story.
+3.1. Learning disentangled  lters
+The basic idea is to revise a benchmark CNN, in order
+to make each  lter in the top conv-layer represent a speci c
+object part. We expect the  lter to be automatically con-
+verged to the representation of a part, instead of using addi-
+tional part annotations to supervise the learning process.
+We apply the  lter loss [40] to each  lter in the top conv-
+layer to push the  lter towards the representation of an ob-
+ject part. As shown in Fig. 3, the  lter is learned to be acti-
+vated by the same object part given different input images.
+Theoretically, our method also supports other techniques
+of mining interpretable features in middle layers [38, 27].
+Nevertheless, the  lter loss usually ensures more meaning-
+ful features than the other approaches.
+Filter loss: Let xf  RL L denote the feature map of
+a  lter f. Without part annotations, the  lter loss forces xf
+to be exclusively activated by a speci c part of a category.
+We can summarize the  lter loss as the minus mutual infor-
+mation between the distribution of feature maps and that of
+part locations.
+Lossf =
+X
+xf  Xf Lossf(xf) =  MI(Xf; P)
+=  
+X
+ Pp( )
+X
+xf  Xf p(xf| ) log p(xf| )
+p(xf)
+(1)
+where MI( ) indicates the mutual information. Xf denotes
+a set of feature maps of f extracted from different input
+images. P = { |  = [h, w], 1  h, w  L}  { } is referred
+to as a set of all part-location candidates. Each location   =
+[h, w] corresponds to an activation unit in xf. Besides,  
+P denotes the case that the target part does not appear in the
+input image. In this case, all units in xf are expected to keep
+inactivated. The joint probability p(xf,  ) to describe the
+compatibility between xf and   (please see [40] for details).
+The  lter loss ensures that given an input image, xf
+should match only one of all L2+1 location candidates. It is
+assumed that repetitive shapes on various regions are more
+likely to describe low-level textures than high-level parts. If
+the part appears, xf should have a single activation peak at
+the part location; otherwise, xf should keep inactivated.
+3.2. Quantitative rationales of CNN predictions
+As analyzed in [2],  lters in high conv-layers are more
+prone to represent object parts, while those in low conv-
+layers usually describe textures. Therefore, we choose  l-
+ters in the top conv-layer to represent object parts. Con-
+sequently, we quantitatively analyze how fully-connected
+(FC) layers use object-part features from the top conv-layer
+to make  nal predictions, as the rationale.
+Given an input image I, let x  RL L D denote the
+feature map of the top conv-layer after a ReLU operation,
+where L denotes the height/width of the feature map, and
+D is the  lter number. Let y denote the scalar classi cation
+score of a certain category before the softmax operation (al-
+though the CNN is usually learned for multiple categories).
+Our task is to use x to represent the rationale of y.
+As discussed in [22, 24], we can use a piecewise linear
+representation to represent the function of cascaded FC lay-
+ers and ReLU layers, as follows.
+y = ffc-n(frelu(      ffc-1(x))) =
+X
+h,w,d
+g(h,w,d)   x(h,w,d) + b (2)
+Filter 1:
+Filter 2:
+ 
+Filter D-1:
+Filter D:
+head pattern
+torso pattern
+feet pattern
+tail pattern
+...
+u
+v
+v 
+u
+ 
+...
+u
+v v 
+u 
+...
+v v 
+0
+Q P
+ 
+1
+P
+2
+P
+...
+Figure 4. Process of learning a decision tree. Green lines in P3
+indicate a parse tree to explain the rationale of the prediction on an
+image.
+where x(h,w,d)  R denotes the element at the location
+(h, w) of the d-th channel; g(h,w,d) is a weight that describes
+the importance of x(h,w,d) for the prediction on I. Theoreti-
+cally, we can compute g =  y
+ x and b=y  g  x.
+We use weights g to denote the speci c rationale of the
+prediction for the input image.
+g(h,w,d)x(h,w,d) measures
+x(h,w,d) s quantitative contribution to the prediction.
+Different input images correspond to different weights
+g, i.e. different rationales of their CNN predictions. It is
+because different images have various signal passing routes
+through ReLU layers. Given an input images I, the CNN
+uses certain weight values that are speci c to I.
+Because each interpretable  lter only has a single activa-
+tion peak [40], we can further compute vectors x, g  RD
+as an approximation to the tensors x,  y
+ x  RL L D to sim-
+plify the computation. We get x(d) =
+1
+sd
+P
+h,w x(h,w,d) and
+g(d) = sd
+L2
+P
+h,w
+ y
+ x(h,w,d) , where x(d) denotes the d-th ele-
+ment of x. sd = EIEh,w x(h,w,d) is used to normalize the
+activation magnitude of the d-th  lter.
+In this way, we can consider x and g to represent predic-
+tion rationales4, i.e. using which  lters/parts for prediction.
+y  gT x + b
+(3)
+Different dimensions of the vector x measure the scalar
+signal strength of different object parts, since a  lter poten-
+tially represents a certain object part. g corresponds to the
+selection of object parts for the CNN prediction.
+4. Learning a decision tree
+We learn a decision tree to interpret the classi cation of
+each category. In the following two subsections, we  rst
+de ne basic concepts in a decision tree and then introduce
+the learning algorithm.
+4Without loss of generality, we normalize g to a unit vector for more
+convincing results: y  y/ g , g g/ g , and b b/ g .
+Algorithm 1 Learning a decision tree for a category
+Input: 1. A CNN with disentangled  lters, 2. training
+images  =  +  .
+Output: A decision tree.
+Initialize a tree Q = P0 and set t = 0
+for each image Ii, i  + do
+Initialize a child of the root of the initial tree Q by
+setting g=gi based on Equation (3) and  =1.
+end for
+for t = t + 1 until  log E  0 do
+1. Choose (v, v ) in the second tree layer of Pt 1 that
+maximize  log E based on Equation (8)
+2. Merge (v, v ) to generate a new node u based on
+Equations (5) and (6), and obtain the tree Pt.
+end for
+Assign  lters with semantic object parts to obtain A.
+4.1. Decision tree
+Let us focus on the decision tree for a certain category.
+We consider images of this category as positive images and
+consider other images as negative images.  + denotes im-
+age indexes of the target category, i.e. positive images, and
+ =  +  represents all training images. For an image
+Ii (i  ), yi denotes the classi cation score of the target
+category before the softmax layer.
+As shown in Fig. 2, each node v in the decision tree en-
+codes a decision mode that is hidden inside FC layers of the
+CNN. A decision mode represents a common rationale of
+the prediction shared by a group of positive training images
+ v  +. The decision tree organizes the hierarchy of deci-
+sion modes in a coarse-to- ne manner from the root node to
+leaf nodes. Children nodes v   Child(v) divides the parent
+v s decision mode into  ne-grained modes. Fine-grained
+modes are shared by sub-groups of images.
+Just like the rationale de ned in Equation (3), the deci-
+sion mode in node v is parameterized with w and b, and
+the mode explains predictions on a certain set of images  v.
+For each image Ii, i  v, the decision mode is given as
+hv(xi) = wT xi + b,
+w =    g
+(4)
+max
+g
+P
+i vcosine(gi, g),
+s.t. gT g = 1
+(5)
+min ,b
+1
+ v 
+P
+i v(wT xi + b  yi)2 +  1
+(6)
+where w is referred to as the rationale of the decision mode.
+g is a unit vector ( g 2 =1) that re ects common rationales
+that are shared by all images in  v.    {0, 1}D is given
+as a binary selection of  lters in the decision mode.  de-
+note element-wise multiplications. We compute sparse   to
+obtain sparse explanations for the decision mode5.
+In particular, when v is a leaf node, the decision mode
+is formulated as the rationale of a speci c image Ii. I.e.
+  = [1, 1, . . . , 1]T and w =  gi = gi, which is computed
+in Equation (3).
+4.2. Learning decision trees
+Just like hierarchical clustering, the basic idea of learn-
+ing a decision tree is to summarize common generic deci-
+sion modes from speci c decision modes of different im-
+ages. Algorithm 1 shows the pseudo-code of the learning
+process. At the beginning, we initialize the decision mode
+gi of each positive image Ii as a leaf node by setting g=gi
+and   = 1. Thus, we build an initial tree Q as shown in
+Fig. 4, in which the root node takes decision modes of all
+positive images as children. Then, in each step, we select
+and merge two nodes v, v   V in the second tree layer (i.e.
+children of the root node) to obtain a new node u, where V
+denotes the children set of the root. u becomes a new child
+of the root node, and v and v  are re-assigned as u s chil-
+dren. The image set of u is de ned as  u =  v  v  and
+we learn  , b, g for u based on Equations (5) and (6).
+In this way, we gradually revise the initial tree P0 = Q
+towards the  nal tree after T merging operations as
+Q = P0  P1  P2        PT =  P
+(7)
+We formulate the objective for learning as follows.
+max
+P
+E,
+E =
+Q
+i + P(xi)
+Q
+i + Q(xi)
+|
+{z
+}
+Discrimination power
+  e V  
+| {z }
+Sparsity of
+decision modes
+(8)
+where P(xi) denotes the likelihood of xi being positive
+that is estimated by the tree P. Q
+i P(xi) indicates the dis-
+criminative power of P.   is a scaling parameter5. This ob-
+jective penalizes the decrease of the discriminative power
+and encourages the system to summarize a few decision
+modes as generic explanations for CNN predictions. We
+compute the likelihood of xi being positive as
+P(xi) = e h(xi)/
+X
+j e h(xj)
+(9)
+where  h(xi)=h v(xi) denotes the prediction on xi based on
+best child  v  V in the second tree layer.   is a constant
+scaling parameter5.
+In the t-th step, we merge two nodes v, v   V in the sec-
+ond tree layer of Pt 1 to get a new node u, thereby obtain-
+ing a new tree Pt. We can easily compute  log E w.r.t. each
+pair of (v, v ) based on Equation (8). Thus, we learn the de-
+cision tree via a greedy strategy. In each step, we select and
+merge the nodes v, v   V that maximize
+ log E
+ v + v   . We
+normalize  log E for reasonable clustering performance.
+4.3. Interpreting CNNs
+Given a testing image Ii, the CNN makes a prediction
+yi. The decision tree estimates quantitative decision modes
+5Please see the experiment section for settings of  ,  , and  .
+of the prediction at different  ne-grained levels. During the
+inference procedure, we can infer a parse tree, which starts
+from the root node, in a top-down manner. Green lines in
+Fig. 4 show a parse tree. When we select the decision mode
+in the node u as the rationale, we can further select its child
+ v that maximizes the compatibility with the most speci c
+rationale gi as a more  ne-grained mode:
+ v = argmaxv Child(u)cosine(gi, wv)
+(10)
+where we add the subscript v to differentiate the parameter
+of v from parameters of other nodes.
+A node v in the parse tree provides the rationale of the
+prediction on image Ii at a certain  ne-grained level. We
+compute the vector  i and  i to evaluate the contribution of
+different  lters and that of different object parts.
+ i = wv  xi,
+ i = A i
+(11)
+where the d-th element of  i  RD,  (d)
+i , denotes the contri-
+bution to the CNN prediction that is made by the d-th  lter.
+If  (d)
+i
+> 0, then the d-th object part makes a positive con-
+tribution. If  (d)
+i
+< 0, then the d-th  lter makes a negative
+contribution. Based on visualization results in Figs. 3 and
+6, we label a matrix A  {0, 1}M D to assign each  lter in
+the top conv-layer with a speci c object part, where M is
+the part number. Each  lter is assigned to a certain part, and
+the annotation cost is O(M). Similarly, the m-th element of
+ i  RM,  (m)
+i
+measures the contribution of the m-th part.
+5. Experiments
+Implementation details:
+We learned four types of
+disentangled CNNs based on structures of four bench-
+mark CNNs, including the AlexNet [18], the VGG-M net-
+work [29], the VGG-S network [29], the VGG-16 net-
+work [29]. Note that as discussed in [40], the  lter loss
+in the explainer is not compatible with skip connections
+in residual networks [14]. We followed the technique of
+[40] to modify an ordinary CNN to a disentangled CNN,
+which changed the top conv-layer of the CNN to a disen-
+tangled conv-layer and further added a disentangled conv-
+layer on the top conv-layer. We used feature maps of the
+new top conv-layer as the input of our decision tree. We
+loaded parameters of all old conv-layers directly from the
+CNN that was pre-trained using images in the ImageNet
+ILSVRC 2012 dataset [8] with a loss for 1000-category
+classi cation.
+We initialized parameters of the new top
+conv-layer and all FC layers. Inspired by previous stud-
+ies of [40], we can weaken the problem of multi-category
+classi cation as a number of single-category classi cation
+to simplify the evaluation of interpretability. Thus, we  ne-
+tuned the CNN for binary classi cation of a single category
+from random images with the log logistic loss using three
+benchmark datasets. We simply set parameters as   = 1,
+  =1/Ei +[yi], and  =10 6p
+ v in all experiments for
+fair comparisons.
+1
+2
+3
+1
+2
+3
+1
+2
+3
+1
+2
+3
+1
+2
+3
+1
+2
+3
+1
+2
+3
+1
+2
+3
+Figure 5. Visualization of decision modes corresponding to nodes in the 2nd tree layer. We show typical images of each decision mode.
+Input
+Activation 
+distribution
+Contribution 
+distribution
+Input
+Activation 
+distribution
+Contribution 
+distribution
+Filter for 
+cat torso
+Filter for 
+cat head
+Filter for 
+bird breast
+Filter for 
+bird nape
+Image receptive fields of a filter on different images
+Figure 6. Object-part contributions for CNN prediction. Pie charts show contribution proportions of different parts, which are estimated
+using nodes in the second tree layer. Heat maps indicate spatial distributions of neural activations in the top conv-layer (note that the
+heat maps do not represent distributions of  contributions,  because neural activations are not weighted by gi). Right  gures show image
+receptive  elds of different  lters estimated by [44]. Based on these receptive  lters, we assign the  lters with different object parts to
+compute the distribution of object-part contributions.
+Datasets: Because the quantitative explanation of CNN
+predictions requires us to assign each  lter in the top conv-
+layer with a speci c object part, we used three bench-
+mark datasets with ground-truth art annotations to evaluate
+our method. The selected datasets include the PASCAL-
+Part Dataset [7], the CUB200-2011 dataset [33], and the
+ILSVRC 2013 DET Animal-Part dataset [38].
+Just like
+in most part-localization studies [7, 38], we used animal
+categories, which prevalently contain non-rigid shape de-
+formation, for evaluation.
+I.e.
+we selected six animal
+categories bird, cat, cow, dog, horse, and sheep from
+the PASCAL Part Dataset. The CUB200-2011 dataset con-
+tains 11.8K images of 200 bird species. Like in [3, 28],
+we ignored species labels and regarded all these images as
+a single bird category. The ILSVRC 2013 DET Animal-
+Part dataset [38] consists of 30 animal categories among all
+the 200 categories for object detection in the ILSVRC 2013
+DET dataset [8].
+Analysis of object parts for prediction: We analyzed
+the contribution of different object parts in the CNN pre-
+diction, when we assigned each  lter with a speci c ob-
+ject part.
+The vector  i in Equation (11) speci es the
+contribution of different object parts in the prediction of
+yi.
+For the m-th object part, we computed contrim =
+| (m)
+i
+|/PM
+m =1 | (m )
+i
+| as the ratio of the part s contribution.
+More speci cally, for CNNs based on the ILSVRC 2013
+DET Animal-Part dataset, we manually labeled the object
+part for each  lter in the top conv-layer. For CNNs based
+on the Pascal VOC Part dataset [7], the study of [40] merged
+tens of small parts into several major landmark parts for the
+six animal categories. Given a CNN for a certain category,
+we used [44] to estimate regions in different images that
+corresponded to each  lter s neural activations, namely the
+image receptive  eld of the  lter (please see Figs. 6 and
+3). For each  lter, we selected a part from all major land-
+mark parts, which was closest to the  lter s image receptive
+ eld through all positive images. For the CNN based on the
+CUB200-2011 dataset, we used ground-truth positions of
+the breast, forehead, nape, tail of birds as major landmark
+parts. Similarly, we assigned each  lter in the top conv-
+layer with the nearest landmark part.
+Evaluation metrics: The evaluation has two aspects.
+Firstly, we use two metrics to evaluate the accuracy of the
+estimated rationale of a prediction. The  rst metric eval-
+uates errors of object-part contributions to the CNN pre-
+diction that were estimated using nodes in the second tree
+layer. Given an input image I,  i in Equation (11) denotes
+the quantitative contribution of the i-th part. Accordingly,
+ 
+i =y  yi is referred to as the ground-truth contribution of
+the part, where y denotes the original CNN prediction on I;
+ yi is the output when we removed neural activations from
+feature maps ( lters) corresponding to the i-th part. In this
+way, we used the deviation EI I[ i  
+i ]/EI I[y] to de-
+note the error of the i-th part contributions. Another metric,
+namely the  tness of contribution distributions, compares
+the ground-truth contribution distribution over different  l-
+Dataset
+2nd
+5th
+10th
+50th
+100th
+ILSVRC Animal-Part
+4.8
+31.6
+69.1
+236.5
+402.1
+VOC Part
+3.8
+25.7
+59.0
+219.5
+361.5
+CUB200-2011
+5.0
+32.0
+64.0
+230.0
+430.0
+Table 1. Average number of nodes in the 2nd, 5th, 10th, 50th, and
+100th layer of decision trees learned for VGG-16 nets.
+ters in the top conv-layer with the estimated contribution
+of these  lters during the prediction process.
+When the
+decision tree uses node  v to explain the prediction for Ii,
+the vector  i in Equation (11) denotes the estimated con-
+tribution distribution of different  lters. ti = gi  xi cor-
+responds to the ground-truth contribution distribution. We
+reported the interaction-of-the-union value between  i and
+ti to measure the  tness of the ground-truth and the esti-
+mated  lter contribution distributions. I.e. we computed
+the  tness as Ei +[
+min( (d)
+i
+,|t(d)
+i
+|)
+max( (d)
+i
+,|t(d)
+i
+|)], where t(d)
+i
+denotes the
+d-th element of ti and  (d)
+i
+= max{ (d)
+i
+sign(t(d)
+i
+), 0}. We
+used non-negative values of  (d)
+i
+and |t(d)
+i
+|, because vectors
+ i and ti may have negative elements.
+Secondly, in addition to the accuracy of the rationale, we
+also measured the information loss of using the decision tree
+to represent a CNN, as a supplementary evaluation. A met-
+ric is the classi cation accuracy. Because  h(xi) denotes
+the prediction of yi based on the best child in the second
+tree layer, we regarded  h( ) as the output of the tree and we
+evaluated the discrimination power of  h( ). We used values
+of  h(xi) for classi cation and compared its classi cation
+accuracy with the accuracy of the CNN. Another metric,
+namely the prediction error, measures the error of the es-
+timated value  h(xi) w.r.t the true value yi. We computed
+the prediction error as Ei +[| h(xi)  yi|]/(maxi yi  
+mini yi), where we normalized the error using the value
+range of yi.
+Evaluation for nodes in different layers: The above three
+metrics evaluate decision modes (nodes) in the second layer
+of the decision tree. Because nodes in lower layers encode
+more  ne-grained decision modes, we extended the three
+metrics to evaluate nodes in low layers. When we evaluated
+nodes in the k-th layer, we temporarily constructed a new
+tree by removing all nodes above the k-th layer and directly
+connecting the root node to nodes in the k-th layer. Thus,
+we can apply the evaluation to the new tree.
+Explanations based on the decision tree: Decision
+modes in the learned decision tree objectively re ected the
+knowledge hidden inside a CNN. Table 1 shows the struc-
+ture of the decision tree by listing numbers of nodes in dif-
+ferent layers of the decision tree. Fig. 5 visualizes deci-
+sion modes in the decision tree. Fig. 6 shows distributions
+of object-part contributions to the CNN prediction, which
+were estimated using nodes in the second layer of decision
+trees.
+breast
+forehead
+nape
+tail
+average
+2nd layer
+0.028
+0.004
+0.013
+0.005
+0.013
+5th layer
+0.024
+0.004
+0.010
+0.006
+0.011
+10th layer
+0.022
+0.004
+0.010
+0.005
+0.010
+50th layer
+0.018
+0.003
+0.008
+0.005
+0.009
+100th layer
+0.019
+0.003
+0.008
+0.005
+0.009
+Table 2. Errors of object-part contributions based on nodes in the
+2nd/5th/10th/50th/100th layer of the decision tree. We use the er-
+ror of object-part contributions to evaluate the estimated rationale
+of a prediction. The CNN was learned using bird images of the
+CUB200 dataset.
+Dataset
+2nd
+5th
+10th
+50th
+100th
+leaves
+VGG-16
+ILSVRC Animal-Part
+0.23
+0.30
+0.36
+0.52
+0.65
+1.00
+VOC Part
+0.22
+0.30
+0.36
+0.53
+0.67
+1.00
+CUB200-2011
+0.21
+0.26
+0.28
+0.33
+0.37
+1.00
+VGG-M
+VOC Part
+0.35
+0.38
+0.46
+0.63
+0.78
+1.00
+CUB200-2011
+0.44
+0.44
+0.46
+0.59
+0.63
+1.00
+VGG-S
+VOC Part
+0.33
+0.35
+0.41
+0.63
+0.80
+1.00
+CUB200-2011
+0.40
+0.40
+0.43
+0.48
+0.52
+1.00
+AlexNet
+VOC Part
+0.37
+0.38
+0.47
+0.66
+0.82
+1.00
+CUB200-2011
+0.47
+0.47
+0.47
+0.58
+0.66
+1.00
+Table 3. Average  tness of contribution distributions based on
+nodes in the 2nd/5th/10th/50th/100th layer and leaf nodes. We use
+the  tness of contribution distributions to evaluate the accuracy of
+the estimated rationale of a prediction.
+Average classi cation accuracy
+Dataset
+CNN
+2nd
+5th
+10th
+50th
+100th
+leaves
+VGG-16
+ILSVRC Animal-Part
+96.7
+94.4
+89.0
+88.7
+88.6
+88.7
+87.8
+VOC Part
+95.4
+94.2
+91.0
+90.1
+89.8
+89.4
+88.2
+CUB200-2011
+96.5
+91.5
+92.2
+88.3
+88.6
+88.9
+85.3
+VGG-M
+VOC Part
+94.2
+95.7
+94.2
+93.1
+93.0
+92.6
+90.8
+CUB200-2011
+96.0
+97.2
+96.8
+96.0
+95.2
+94.9
+93.5
+VGG-S
+VOC Part
+95.5
+92.7
+92.6
+91.3
+90.2
+88.8
+86.1
+CUB200-2011
+95.8
+95.4
+94.9
+93.1
+93.4
+93.6
+88.8
+AlexNet
+VOC Part
+93.9
+90.7
+88.6
+88.6
+87.9
+86.2
+84.1
+CUB200-2011
+95.4
+94.9
+94.2
+94.3
+92.8
+92.0
+90.0
+Average prediction error
+A
+Dataset
+2nd
+5th
+10th
+50th
+100th
+leaves
+VGG-16
+ILSVRC Animal-Part
+0.052
+0.064
+0.063
+0.049
+0.034
+0.00
+VOC Part
+0.052
+0.066
+0.070
+0.051
+0.035
+0.00
+CUB200-2011
+0.075
+0.099
+0.101
+0.087
+0.083
+0.00
+VGG-M
+VOC Part
+0.053
+0.051
+0.051
+0.034
+0.019
+0.00
+CUB200-2011
+0.036
+0.037
+0.038
+0.035
+0.030
+0.00
+VGG-S
+VOC Part
+0.047
+0.047
+0.045
+0.035
+0.019
+0.00
+CUB200-2011
+0.045
+0.046
+0.050
+0.051
+0.038
+0.00
+AlexNet
+VOC Part
+0.055
+0.058
+0.055
+0.038
+0.020
+0.00
+CUB200-2011
+0.044
+0.044
+0.045
+0.039
+0.033
+0.00
+Table 4. Average classi cation accuracy and average prediction er-
+ror based on nodes in the 2nd/5th/10th/50th/100th layer and leaf
+nodes of the tree. We use the classi cation accuracy and the pre-
+diction error to measure the information loss when using a decision
+tree to represent a CNN.
+Table 4 evaluates the information loss when we use the
+decision tree to represent a CNN. Metrics of the average
+classi cation accuracy, the average prediction error are used
+for evaluation. Tables 2 and 3 use errors of object-part con-
+tributions and the average  tness of contribution distribu-
+tions, respectively, to evaluate the accuracy of the estimated
+rationales based on nodes in different tree layers.
+Gen-
+erally speaking, because  ne-grained decision modes are
+close to the image-speci c rationale,  ne-grained decision
+modes usually yielded lower error prediction rates. How-
+ever,  ne-grained decision modes did not exhibit higher ac-
+curacy in classi cation. It is because our method is designed
+to mine common decision modes for objects of a certain cat-
+egory, and ignores random/negative images, which is differ-
+ent from the discriminative learning of classi ers.
+6. Conclusion and discussions
+In this study, we use a decision tree to explain CNN pre-
+dictions at the semantic level. We have developed a method
+to revise a CNN and built a tight coupling of the CNN and
+a decision tree. The proposed decision tree encodes deci-
+sion modes of the CNN as quantitative rationales for each
+CNN prediction. Our method does not need any annota-
+tions of object parts or textures in training images to guide
+the learning the CNN. We have tested our method in differ-
+ent benchmark datasets, and experiments have proved the
+effectiveness of our approach.
+Note that theoretically, the decision tree just provides an
+approximate explanation for CNN predictions, instead of
+an accurate reconstruction of CNN representation details.
+There are two reasons. Firstly, without accurate object-part
+annotations to supervised the learning of CNNs, the  lter
+loss can only roughly make each  lter to represent an ob-
+ject part. The  lter may produce incorrect activations in a
+few challenging images. Secondly, the decision mode in
+each node ignores insigni cant object-part  lters to ensure
+a sparse representation of the decision mode.
