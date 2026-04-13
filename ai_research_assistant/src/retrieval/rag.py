@@ -1,17 +1,27 @@
+from transformers import pipeline
 import os
 import requests
-from .prompts import SUMMARY_PROMPT
 from dotenv import load_dotenv
 
 load_dotenv()
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
-def summarize_chunk(chunk: str, prompt: str = SUMMARY_PROMPT) -> str:
-    input_text = prompt.format(chunk=chunk)
 
-    print(input_text)
-    print("--------------------------------")
 
+
+def generate_answer(query: str, retrieved_chunks: list):
+    context = "\n\n".join([c["text"] for c in retrieved_chunks])
+
+    prompt = f"""
+        Answer the question using ONLY the context below.
+
+        Context:
+        {context}
+
+        Question:
+        {query}
+        """
+    
     response = requests.post(
         url="https://openrouter.ai/api/v1/chat/completions",
         headers={
@@ -21,7 +31,7 @@ def summarize_chunk(chunk: str, prompt: str = SUMMARY_PROMPT) -> str:
         json={
             "model": "openai/gpt-oss-120b:free",
             "messages": [
-                {"role": "user", "content": input_text}
+                {"role": "user", "content": prompt}
             ],
             "temperature": 0.0,
             "top_p": 1.0,

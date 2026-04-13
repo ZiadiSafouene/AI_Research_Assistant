@@ -2,3 +2,6 @@ pymupdf
 pdfplumber
 transformers
 torch
+dotenv
+qdrant-client
+sentence-transformers
